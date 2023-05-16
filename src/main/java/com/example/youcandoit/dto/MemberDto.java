@@ -11,20 +11,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class MemberDto {
-    private String mem_id;
+    private String memId;
     private String password;
     private String nickname;
-    private String phone_number;
-    private String profile_picture;
+    private String phoneNumber;
+    private String profilePicture;
+    private String joinDate;
 
-    public MemberEntity toEntity(String join_date) {
+    public MemberEntity toEntity() {
         return MemberEntity.builder()
-                .mem_id(mem_id)
+                .memId(memId)
                 .password(password)
                 .nickname(nickname)
-                .phone_number(phone_number)
-                .profile_picture(profile_picture)
-                .join_date(join_date)
+                .phoneNumber(phoneNumber)
+                .profilePicture(profilePicture)
+                .joinDate(joinDate)
                 .build();
     }
 }
