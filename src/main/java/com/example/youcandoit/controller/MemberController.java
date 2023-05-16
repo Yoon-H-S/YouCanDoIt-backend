@@ -36,4 +36,10 @@ public class MemberController {
     }
 
     // kim test
+    // api/member-api/login
+    // 로그인
+    @PostMapping("/login")
+    public void loginMember(@RequestBody MemberDto memberDto) {
+        memberService.loginMember(memberDto);
+    }
 }

@@ -7,4 +7,6 @@ public interface MemberService {
     void saveMember(MemberDto memberDto);
 
     MemberDto duplicateId(String mem_id);
+
+    MemberDto loginMember(MemberDto memberDto);
 }

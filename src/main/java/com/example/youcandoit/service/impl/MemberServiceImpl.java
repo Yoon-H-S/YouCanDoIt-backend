@@ -39,4 +39,29 @@ public class MemberServiceImpl implements MemberService {
         else
             return getId.get().toDto(); // Entity -> Dto로 변환
     }
+
+    @Override
+    public MemberDto loginMember(MemberDto memberDto){
+        /*
+            1. 회원이 입력한 아이디로 DB에서 조회를 함
+            2. DB에서 조회한 비밀번호와 사용자가 입력한 비밀번호가 일치하는지 판단
+         */
+        Optional<MemberEntity> getId = memberRepository.findById(memberDto.getMem_id());
+        if(getId.isPresent()) {
+            // 조회 결과가 있다(해당 아이디을 가진 회원 정보가 있다)
+            MemberEntity memberEntity = getId.get();
+            if (memberEntity.getPassword().equals(memberDto.getPassword())) {
+                // 비밀번호 일치
+                // dto -> entity 변환 후 리턴
+                MemberDto dto = MemberEntity.builder().build().toDto();
+                return dto;
+            } else {
+                // 비밀번호 불일치
+                return null;
+            }
+        } else {
+        // 조회 결과가 없다(해당 아이디를 가진 회원 정보가 없다.)
+        return null;
+        }
+    }
 }
