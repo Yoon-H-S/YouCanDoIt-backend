@@ -34,4 +34,6 @@ public class MemberController {
     public void createMember(@RequestBody MemberDto memberDto) {
         memberService.saveMember(memberDto);
     }
+
+    // kim test
 }
