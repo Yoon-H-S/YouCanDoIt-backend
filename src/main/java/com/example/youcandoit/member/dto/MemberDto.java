@@ -1,6 +1,6 @@
-package com.example.youcandoit.dto;
+package com.example.youcandoit.member.dto;
 
-import com.example.youcandoit.entity.MemberEntity;
+import com.example.youcandoit.member.entity.MemberEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

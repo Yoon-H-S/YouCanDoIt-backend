@@ -1,6 +1,6 @@
-package com.example.youcandoit.entity;
+package com.example.youcandoit.member.entity;
 
-import com.example.youcandoit.dto.MemberDto;
+import com.example.youcandoit.member.dto.MemberDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

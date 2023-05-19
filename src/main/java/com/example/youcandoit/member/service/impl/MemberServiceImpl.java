@@ -1,18 +1,16 @@
-package com.example.youcandoit.service.impl;
+package com.example.youcandoit.member.service.impl;
 
-import com.example.youcandoit.dto.MemberDto;
-import com.example.youcandoit.entity.MemberEntity;
-import com.example.youcandoit.repository.MemberRepository;
-import com.example.youcandoit.service.MemberService;
+import com.example.youcandoit.member.dto.MemberDto;
+import com.example.youcandoit.member.entity.MemberEntity;
+import com.example.youcandoit.member.service.MemberService;
+import com.example.youcandoit.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
 public class MemberServiceImpl implements MemberService {
-
     MemberRepository memberRepository;
 
     @Autowired // 자동 연결
@@ -20,9 +18,21 @@ public class MemberServiceImpl implements MemberService {
         this.memberRepository = memberRepository;
     }
 
-    // 중복 아이디 조회
     @Override
-    public MemberDto duplicateId(String memId) {
+    public MemberDto loginMember(MemberDto memberDto){
+        // 회원이 입력한 아이디와 비밀번호로 DB에서 조회
+        Optional<MemberEntity> getColumn = memberRepository.findByPasswordAndMemId(memberDto.getPassword() ,memberDto.getMemId());
+
+        if(getColumn.isPresent()) { // 조회 결과가 있다(해당 아이디을 가진 회원 정보가 있다)
+            return getColumn.get().toDto();
+        } else { // 조회 결과가 없다(해당 아이디를 가진 회원 정보가 없다.
+            return null;
+        }
+    }
+
+    // 아이디로 컬럼 조회(중복 아이디 조회, 세션값으로 닉네임 받기)
+    @Override
+    public MemberDto getId(String memId) {
         // db에서 값받아서 Entity에 저장
         Optional<MemberEntity> getColumn = memberRepository.findById(memId);
 
