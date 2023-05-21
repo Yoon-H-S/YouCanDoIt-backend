@@ -1,15 +1,15 @@
 package com.example.youcandoit.friend.entity;
 
 import com.example.youcandoit.friend.dto.FriendDto;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.example.youcandoit.member.dto.MemberDto;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.lang.reflect.Member;
 
 @Entity // 이 클래스는 엔티티이다.
 @Data
