@@ -2,6 +2,7 @@ package com.example.youcandoit.member.controller;
 
 import com.example.youcandoit.member.dto.MemberDto;
 import com.example.youcandoit.member.service.MemberService;
+import com.example.youcandoit.member.service.SnsLoginService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +19,12 @@ import java.time.LocalDate;
 public class MemberController {
 
     private MemberService memberService;
+    private SnsLoginService snsLoginService;
 
     @Autowired
-    public MemberController(MemberService memberService) {
+    public MemberController(MemberService memberService, SnsLoginService snsLoginService) {
         this.memberService = memberService;
+        this.snsLoginService = snsLoginService;
     }
 
     // api/member-api/login
@@ -257,5 +260,23 @@ public class MemberController {
         } else {
             return false;
         }
+    }
+
+    // sns 로그인
+    @GetMapping("oauth2/code/{registrationId}")
+    public Object snsLogin(@RequestParam String code, @PathVariable String registrationId, HttpSession session) {
+        String accessToken = snsLoginService.getAccessToken(code, registrationId);
+        HashMap<String, Object> userInfo = snsLoginService.getResource(accessToken, registrationId);
+        MemberDto mDto = MemberDto.builder()
+                .memId(userInfo.get("email").toString())
+                .password(userInfo.get("id").toString())
+                .memClass("2")
+                .build();
+        MemberDto memberDto = memberService.loginMember(mDto);
+
+        if(memberDto == null)
+            return userInfo;
+        session.setAttribute("loginId", memberDto.getMemId());
+        return memberDto.getNickname();
     }
 }

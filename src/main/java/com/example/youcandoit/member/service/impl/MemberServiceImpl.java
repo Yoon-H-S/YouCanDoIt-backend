@@ -6,11 +6,11 @@ import com.example.youcandoit.member.service.MemberService;
 import com.example.youcandoit.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 @Service
 public class MemberServiceImpl implements MemberService {
+
     MemberRepository memberRepository;
 
     @Autowired // 자동 연결
@@ -21,7 +21,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberDto loginMember(MemberDto memberDto){
         // 회원이 입력한 아이디와 비밀번호로 DB에서 조회
-        Optional<MemberEntity> getColumn = memberRepository.findByPasswordAndMemId(memberDto.getPassword() ,memberDto.getMemId());
+        Optional<MemberEntity> getColumn = memberRepository.findByPasswordAndMemIdAndMemClass(memberDto.getPassword() ,memberDto.getMemId(), memberDto.getMemClass());
 
         if(getColumn.isPresent()) { // 조회 결과가 있다(해당 아이디을 가진 회원 정보가 있다)
             return getColumn.get().toDto();
@@ -86,7 +86,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     // 비밀번호 재설정
-
     @Override
     public void resetPw(MemberDto memberDto) {
         Optional<MemberEntity> getColumn = memberRepository.findById(memberDto.getMemId());

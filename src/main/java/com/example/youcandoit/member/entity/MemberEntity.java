@@ -29,6 +29,8 @@ public class MemberEntity {
     String profilePicture;
     @Column(name = "join_date")
     String joinDate;
+    @Column(name = "mem_class")
+    String memClass;
 
     public MemberDto toDto() {
         return MemberDto.builder()
@@ -38,6 +40,7 @@ public class MemberEntity {
                 .phoneNumber(phoneNumber)
                 .profilePicture(profilePicture)
                 .joinDate(joinDate)
+                .memClass(memClass)
                 .build();
     }
 }
