@@ -1,6 +1,6 @@
 package com.example.youcandoit.member.controller;
 
-import com.example.youcandoit.member.dto.MemberDto;
+import com.example.youcandoit.dto.MemberDto;
 import com.example.youcandoit.member.service.MemberService;
 import com.example.youcandoit.member.service.SnsLoginService;
 import jakarta.servlet.http.HttpSession;
@@ -79,6 +79,7 @@ public class MemberController {
         memberService.saveProfile(memberDto);
     }
 
+    // api/member-api/find-id
     // 전화번호로 아이디 찾기
     @PostMapping("/find-id")
     public MemberDto findId(@RequestBody MemberDto mDto) {
@@ -89,6 +90,7 @@ public class MemberController {
         return memberDto;
     }
 
+    // api/member-api/find-pw
     // 아이디와 전화번호가 일치하는 회원이 있는지 확인
     @PostMapping("/find-pw")
     public MemberDto findPw(@RequestBody MemberDto mDto) {
@@ -99,12 +101,14 @@ public class MemberController {
         return memberDto;
     }
 
+    // api/member-api/pw-reset
     // 비밀번호 재설정
     @PostMapping("/pw-reset")
     public void pwReset(@RequestBody MemberDto memberDto) {
         memberService.resetPw(memberDto);
     }
 
+    // api/member-api/is-login
     // 로그인 여부
     @GetMapping("is-login")
     public String isLogin(HttpSession session) {
@@ -116,12 +120,14 @@ public class MemberController {
         return memberDto.getNickname();
     }
 
+    // api/member-api/logout
     // 로그아웃
     @GetMapping("logout")
     public void logout(HttpSession session) {
         session.removeAttribute("loginId");
     }
 
+    // api/member-api/sms-send
     // 인증번호 발송
     @PostMapping("sms-send")
     public boolean smsSend(@RequestBody MemberDto mDto, HttpSession session) {
@@ -250,6 +256,7 @@ public class MemberController {
         }
     }
 
+    // api/member-api/certify
     // 인증하기
     @PostMapping("certify")
     public boolean certify(@RequestParam String phoneNumber, @RequestParam String certifyNum, HttpSession session) {
@@ -262,6 +269,7 @@ public class MemberController {
         }
     }
 
+    // api/member-api/oauth2/code/
     // sns 로그인
     @GetMapping("oauth2/code/{registrationId}")
     public Object snsLogin(@RequestParam String code, @PathVariable String registrationId, HttpSession session) {
@@ -278,5 +286,14 @@ public class MemberController {
             return userInfo;
         session.setAttribute("loginId", memberDto.getMemId());
         return memberDto.getNickname();
+    }
+
+    //--------------------------------------- 친구페이지에서 사용하는 멤버 api ---------------------------------------
+    // 내 프로필
+    @GetMapping("my-profile")
+    public MemberDto myProfile(HttpSession session) {
+        String loginId = (String)session.getAttribute("loginId");
+        MemberDto memberDto = memberService.myProfile(loginId);
+        return memberDto;
     }
 }

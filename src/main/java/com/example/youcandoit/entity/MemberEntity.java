@@ -1,10 +1,7 @@
-package com.example.youcandoit.member.entity;
+package com.example.youcandoit.entity;
 
-import com.example.youcandoit.member.dto.MemberDto;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.example.youcandoit.dto.MemberDto;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -18,19 +15,19 @@ import org.hibernate.annotations.DynamicUpdate;
 public class MemberEntity {
     @Id
     @Column(name = "mem_id")
-    String memId;
+    private String memId;
     @Column(name = "password")
-    String password;
+    private String password;
     @Column(name = "nickname")
-    String nickname;
+    private String nickname;
     @Column(name = "phone_number")
-    String phoneNumber;
+    private String phoneNumber;
     @Column(name = "profile_picture")
-    String profilePicture;
+    private String profilePicture;
     @Column(name = "join_date")
-    String joinDate;
+    private String joinDate;
     @Column(name = "mem_class")
-    String memClass;
+    private String memClass;
 
     public MemberDto toDto() {
         return MemberDto.builder()

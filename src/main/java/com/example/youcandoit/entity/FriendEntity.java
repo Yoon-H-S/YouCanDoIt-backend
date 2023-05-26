@@ -1,15 +1,10 @@
-package com.example.youcandoit.friend.entity;
+package com.example.youcandoit.entity;
 
-import com.example.youcandoit.friend.dto.FriendDto;
-import com.example.youcandoit.member.dto.MemberDto;
+import com.example.youcandoit.entity.Id.FriendId;
+import com.example.youcandoit.dto.FriendDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-
-import java.lang.reflect.Member;
 
 @Entity // 이 클래스는 엔티티이다.
 @Data
@@ -18,12 +13,14 @@ import java.lang.reflect.Member;
 @Builder
 @Table(name = "friend") // db의 해당 테이블과 연결
 @DynamicUpdate
+@IdClass(FriendId.class)
 public class FriendEntity {
     @Id
     @Column(name = "mem_id")
-    String memId;
+    private String memId;
+    @Id
     @Column(name = "friend_id")
-    String friendId;
+    private String friendId;
 
     public FriendDto toDto() {
         return FriendDto.builder()

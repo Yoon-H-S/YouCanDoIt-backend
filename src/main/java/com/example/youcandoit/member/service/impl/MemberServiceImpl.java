@@ -1,7 +1,7 @@
 package com.example.youcandoit.member.service.impl;
 
-import com.example.youcandoit.member.dto.MemberDto;
-import com.example.youcandoit.member.entity.MemberEntity;
+import com.example.youcandoit.dto.MemberDto;
+import com.example.youcandoit.entity.MemberEntity;
 import com.example.youcandoit.member.service.MemberService;
 import com.example.youcandoit.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,5 +93,11 @@ public class MemberServiceImpl implements MemberService {
         memberEntity.setPassword(memberDto.getPassword());
 
         memberRepository.save(memberEntity);
+    }
+
+    // 친구목록의 내 프로필
+    public MemberDto myProfile(String loginId) {
+        Optional<MemberEntity> getColumn = memberRepository.findById(loginId);
+        return getColumn.get().toDto();
     }
 }

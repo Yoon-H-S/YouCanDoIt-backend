@@ -1,6 +1,6 @@
 package com.example.youcandoit.member.repository;
 
-import com.example.youcandoit.member.entity.MemberEntity;
+import com.example.youcandoit.entity.MemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

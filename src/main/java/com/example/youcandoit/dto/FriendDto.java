@@ -1,10 +1,8 @@
-package com.example.youcandoit.friend.dto;
+package com.example.youcandoit.dto;
 
-import com.example.youcandoit.friend.entity.FriendEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.example.youcandoit.entity.FriendEntity;
+import com.example.youcandoit.entity.MemberEntity;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
