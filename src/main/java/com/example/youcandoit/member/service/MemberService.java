@@ -11,5 +11,4 @@ public interface MemberService {
     MemberDto findId(MemberDto memberDto);
     MemberDto findPw(MemberDto memberDto);
     void resetPw(MemberDto memberDto);
-    MemberDto myProfile(String loginId);
 }

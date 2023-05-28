@@ -16,7 +16,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "challenge_group") // db의 해당 테이블과 연결
+@Table(name = "godlife_challenge") // db의 해당 테이블과 연결
 @DynamicUpdate
 public class GodlifeChallengeEntity {
     @Id

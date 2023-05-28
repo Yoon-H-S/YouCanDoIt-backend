@@ -18,7 +18,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "Group_person") // db의 해당 테이블과 연결
+@Table(name = "pedometer_ranking") // db의 해당 테이블과 연결
 @DynamicUpdate
 @IdClass(PedometerRankingId.class)
 public class PedometerRankingEntity {

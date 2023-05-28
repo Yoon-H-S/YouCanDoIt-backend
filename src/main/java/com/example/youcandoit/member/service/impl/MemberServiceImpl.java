@@ -21,10 +21,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberDto loginMember(MemberDto memberDto){
         // 회원이 입력한 아이디와 비밀번호로 DB에서 조회
-        Optional<MemberEntity> getColumn = memberRepository.findByPasswordAndMemIdAndMemClass(memberDto.getPassword() ,memberDto.getMemId(), memberDto.getMemClass());
+        Optional<MemberEntity> getRow = memberRepository.findByPasswordAndMemIdAndMemClass(memberDto.getPassword() ,memberDto.getMemId(), memberDto.getMemClass());
 
-        if(getColumn.isPresent()) { // 조회 결과가 있다(해당 아이디을 가진 회원 정보가 있다)
-            return getColumn.get().toDto();
+        if(getRow.isPresent()) { // 조회 결과가 있다(해당 아이디을 가진 회원 정보가 있다)
+            return getRow.get().toDto();
         } else { // 조회 결과가 없다(해당 아이디를 가진 회원 정보가 없다.
             return null;
         }
@@ -34,12 +34,12 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberDto getId(String memId) {
         // db에서 값받아서 Entity에 저장
-        Optional<MemberEntity> getColumn = memberRepository.findById(memId);
+        Optional<MemberEntity> getRow = memberRepository.findById(memId);
 
-        if(getColumn.isEmpty())
+        if(getRow.isEmpty())
             return null;
         else
-            return getColumn.get().toDto(); // Entity -> Dto로 변환
+            return getRow.get().toDto(); // Entity -> Dto로 변환
     }
 
     // 회원가입
@@ -54,8 +54,8 @@ public class MemberServiceImpl implements MemberService {
     // 프로필사진경로 저장
     @Override
     public void saveProfile(MemberDto memberDto) {
-        Optional<MemberEntity> getColumn = memberRepository.findById(memberDto.getMemId());
-        MemberEntity memberEntity = getColumn.get();
+        Optional<MemberEntity> getRow = memberRepository.findById(memberDto.getMemId());
+        MemberEntity memberEntity = getRow.get();
         memberEntity.setProfilePicture(memberDto.getProfilePicture());
 
         memberRepository.save(memberEntity);
@@ -64,40 +64,36 @@ public class MemberServiceImpl implements MemberService {
     // 전화번호로 아이디 찾기
     @Override
     public MemberDto findId(MemberDto memberDto) {
-        Optional<MemberEntity> getColumn = memberRepository.findByPhoneNumber(memberDto.getPhoneNumber());
+        Optional<MemberEntity> getRow = memberRepository.findByPhoneNumber(memberDto.getPhoneNumber());
 
-        if(getColumn.isEmpty()) {
+        if(getRow.isEmpty()) {
             return null;
         } else {
-            return getColumn.get().toDto(); // Entity -> Dto로 변환
+            return getRow.get().toDto(); // Entity -> Dto로 변환
         }
     }
 
     // 아이디와 전화번호가 일치하는 회원이 있는지 확인
     @Override
     public MemberDto findPw(MemberDto memberDto) {
-        Optional<MemberEntity> getColumn = memberRepository.findByPhoneNumberAndMemId(memberDto.getPhoneNumber(), memberDto.getMemId());
+        Optional<MemberEntity> getRow = memberRepository.findByPhoneNumberAndMemId(memberDto.getPhoneNumber(), memberDto.getMemId());
 
-        if(getColumn.isEmpty()) {
+        if(getRow.isEmpty()) {
             return null;
         } else {
-            return getColumn.get().toDto(); // Entity -> Dto로 변환
+            return getRow.get().toDto(); // Entity -> Dto로 변환
         }
     }
 
     // 비밀번호 재설정
     @Override
     public void resetPw(MemberDto memberDto) {
-        Optional<MemberEntity> getColumn = memberRepository.findById(memberDto.getMemId());
-        MemberEntity memberEntity = getColumn.get();
+        Optional<MemberEntity> getRow = memberRepository.findById(memberDto.getMemId());
+        MemberEntity memberEntity = getRow.get();
         memberEntity.setPassword(memberDto.getPassword());
 
         memberRepository.save(memberEntity);
     }
 
-    // 친구목록의 내 프로필
-    public MemberDto myProfile(String loginId) {
-        Optional<MemberEntity> getColumn = memberRepository.findById(loginId);
-        return getColumn.get().toDto();
-    }
+
 }
