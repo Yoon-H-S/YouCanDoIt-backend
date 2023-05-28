@@ -54,6 +54,8 @@ public class MemberController {
     // 회원가입
     @PostMapping("/signup")
     public void createMember(@RequestBody MemberDto memberDto) {
+        String defaultProfilePicture = "/home/yun/ycdi/profilePicture/profile" + ((int)(Math.random() * 8) + 1) + ".png";
+        memberDto.setProfilePicture(defaultProfilePicture);
         memberDto.setJoinDate(String.valueOf(LocalDate.now()));
         memberService.saveMember(memberDto);
     }
@@ -64,7 +66,7 @@ public class MemberController {
     public void insertProfile(@RequestParam String memId, @RequestPart MultipartFile file) {
         String fileName = file.getOriginalFilename();
         String extension = fileName.substring(fileName.length()-4); // 확장자 추출
-        String path = "D:/project/profile/"; // 저장 경로 지정
+        String path = "/home/yun/ycdi/profilePicture/"; // 저장 경로 지정
         String safeName = path + memId + "Profile" + extension; // 저장명 지정
 
         try {
@@ -286,14 +288,5 @@ public class MemberController {
             return userInfo;
         session.setAttribute("loginId", memberDto.getMemId());
         return memberDto.getNickname();
-    }
-
-    //--------------------------------------- 친구페이지에서 사용하는 멤버 api ---------------------------------------
-    // 내 프로필
-    @GetMapping("my-profile")
-    public MemberDto myProfile(HttpSession session) {
-        String loginId = (String)session.getAttribute("loginId");
-        MemberDto memberDto = memberService.myProfile(loginId);
-        return memberDto;
     }
 }
