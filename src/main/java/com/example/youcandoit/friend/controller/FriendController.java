@@ -55,12 +55,10 @@ public class FriendController {
 
     // 친구 상세 프로필(같이 속한 그룹)
     @PostMapping("friend-profile")
-    public List<Object[]> friendProfile(@RequestBody FriendDto friendDto, HttpSession session) {
+    public List<Object> friendProfile(@RequestBody FriendDto friendDto, HttpSession session) {
         friendDto.setMemId((String)session.getAttribute("loginId"));
-        List<Object[]> friendProfile = friendService.friendProfile(friendDto);
+        List<Object> friendProfile = friendService.friendProfile(friendDto);
 
-        if(friendProfile == null)
-            return null;
         return friendProfile;
     }
 
