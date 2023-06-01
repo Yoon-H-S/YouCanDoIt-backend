@@ -1,8 +1,10 @@
 package com.example.youcandoit.friend.service.impl;
 
 import com.example.youcandoit.dto.FriendDto;
+import com.example.youcandoit.dto.GroupDto;
 import com.example.youcandoit.dto.MemberDto;
 import com.example.youcandoit.entity.FriendEntity;
+import com.example.youcandoit.entity.GroupEntity;
 import com.example.youcandoit.friend.repository.FriendRepository;
 import com.example.youcandoit.friend.service.FriendService;
 import com.example.youcandoit.entity.MemberEntity;
@@ -66,9 +68,18 @@ public class FriendServiceImpl implements FriendService {
 
     // 친구 상세 프로필(같이 있는 그룹)
     @Override
-    public List<Object[]> friendProfile(FriendDto friendDto) {
-        List<Object[]> getRow = friendRepository.findFriendProfile(friendDto.getMemId(), friendDto.getFriendId());
-        return getRow;
+    public List<Object> friendProfile(FriendDto friendDto) {
+        Optional<MemberEntity> getRow1 = memberRepository.findById(friendDto.getFriendId());
+        List<Object[]> getRow2 = friendRepository.findWithGroup(friendDto.getMemId(), friendDto.getFriendId());
+
+        List<Object> friendProfile = new ArrayList<Object>();
+
+        friendProfile.add(MemberDto.builder().nickname(getRow1.get().getNickname()).profilePicture(getRow1.get().getProfilePicture()).build());
+        friendProfile.add(getRow2);
+
+        System.out.println(friendProfile);
+
+        return friendProfile;
     }
 
     // 친구추가 페이지의 검색

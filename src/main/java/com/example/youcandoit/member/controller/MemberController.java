@@ -30,13 +30,13 @@ public class MemberController {
     // api/member-api/login
     // 로그인
     @PostMapping("/login")
-    public String loginMember(@RequestBody MemberDto mDto, HttpSession session) {
+    public MemberDto loginMember(@RequestBody MemberDto mDto, HttpSession session) {
         MemberDto memberDto = memberService.loginMember(mDto);
 
         if(memberDto == null)
             return null;
         session.setAttribute("loginId", memberDto.getMemId());
-        return memberDto.getNickname();
+        return memberDto;
     }
 
     // api/member-api/duplicate-id/{id}
@@ -54,7 +54,7 @@ public class MemberController {
     // 회원가입
     @PostMapping("/signup")
     public void createMember(@RequestBody MemberDto memberDto) {
-        String defaultProfilePicture = "/home/yun/ycdi/profilePicture/profile" + ((int)(Math.random() * 8) + 1) + ".png";
+        String defaultProfilePicture = "/profilePicture/profile" + ((int)(Math.random() * 16) + 1) + ".png";
         memberDto.setProfilePicture(defaultProfilePicture);
         memberDto.setJoinDate(String.valueOf(LocalDate.now()));
         memberService.saveMember(memberDto);
@@ -66,17 +66,17 @@ public class MemberController {
     public void insertProfile(@RequestParam String memId, @RequestPart MultipartFile file) {
         String fileName = file.getOriginalFilename();
         String extension = fileName.substring(fileName.length()-4); // 확장자 추출
-        String path = "/home/yun/ycdi/profilePicture/"; // 저장 경로 지정
-        String safeName = path + memId + "Profile" + extension; // 저장명 지정
+        String dbName = "/profilePicture/" + memId + "Profile" + extension; //  db에 저장될 경로, 저장명 지정
+        String saveName = "/home/yun/ycdi/build/profilePicture/" + memId + "Profile" + extension; // 실제 저장경로, 저장명 지정
 
         try {
-            file.transferTo(new File(safeName)); // 파일 저장
+            file.transferTo(new File(saveName)); // 파일 저장
         } catch (IOException e) {
             e.printStackTrace();
         }
         MemberDto memberDto = MemberDto.builder()
                 .memId(memId)
-                .profilePicture(safeName)
+                .profilePicture(dbName)
                 .build();
         memberService.saveProfile(memberDto);
     }
@@ -113,13 +113,13 @@ public class MemberController {
     // api/member-api/is-login
     // 로그인 여부
     @GetMapping("is-login")
-    public String isLogin(HttpSession session) {
+    public MemberDto isLogin(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
         if(loginId == null) {
             return null;
         }
         MemberDto memberDto = memberService.getId(loginId);
-        return memberDto.getNickname();
+        return memberDto;
     }
 
     // api/member-api/logout

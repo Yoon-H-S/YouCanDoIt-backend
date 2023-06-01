@@ -1,9 +1,12 @@
 package com.example.youcandoit.friend.service.impl;
 
 import com.example.youcandoit.dto.GroupDto;
+import com.example.youcandoit.dto.GroupPersonDto;
 import com.example.youcandoit.dto.MemberDto;
 import com.example.youcandoit.entity.GroupEntity;
+import com.example.youcandoit.entity.GroupPersonEntity;
 import com.example.youcandoit.entity.MemberEntity;
+import com.example.youcandoit.friend.repository.GroupPersonRepository;
 import com.example.youcandoit.friend.repository.GroupRepository;
 import com.example.youcandoit.friend.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +19,12 @@ import java.util.Optional;
 @Service
 public class GroupServiceImpl implements GroupService {
     GroupRepository groupRepository;
+    GroupPersonRepository groupPersonRepository;
 
     @Autowired // 자동 연결
-    public GroupServiceImpl(GroupRepository groupRepository) {
+    public GroupServiceImpl(GroupRepository groupRepository, GroupPersonRepository groupPersonRepository) {
         this.groupRepository = groupRepository;
+        this.groupPersonRepository = groupPersonRepository;
     }
 
     // 그룹 목록
@@ -32,7 +37,7 @@ public class GroupServiceImpl implements GroupService {
         } else { // 조회 결과가 있다.
             List<GroupDto> friends = new ArrayList<GroupDto>();
             for(GroupEntity row : getRow) {
-                friends.add(GroupDto.builder().groupName(row.getGroupName()).groupNumber(row.getGroupNumber()).build());
+                friends.add(GroupDto.builder().groupName(row.getGroupName()).groupNumber(row.getGroupNumber()).groupHeadcount(row.getGroupHeadcount()).build());
             }
             return friends;
         }
@@ -48,7 +53,7 @@ public class GroupServiceImpl implements GroupService {
         } else { // 조회 결과가 있다.
             List<GroupDto> friends = new ArrayList<GroupDto>();
             for(GroupEntity row : getRow) {
-                friends.add(GroupDto.builder().groupName(row.getGroupName()).groupNumber(row.getGroupNumber()).build());
+                friends.add(GroupDto.builder().groupName(row.getGroupName()).groupNumber(row.getGroupNumber()).groupHeadcount(row.getGroupHeadcount()).build());
             }
             return friends;
         }
@@ -56,18 +61,26 @@ public class GroupServiceImpl implements GroupService {
 
     // 그룹 프로필사진
     @Override
+    public List<String[]> groupProfilePicture(int[] groupNumber) {
+        List<String[]> profilePicture = new ArrayList<String[]>();
+        for(int number : groupNumber) {
+            List<String> getRow = groupRepository.findProfilePicture(number);
+
+            profilePicture.add(getRow.toArray(new String[getRow.size()]));
+        }
+        return profilePicture;
+    }
+
+    // 그룹 멤버
+    @Override
     public List<MemberDto> groupMember(int groupNumber) {
         List<MemberEntity> getRow = groupRepository.findGroupMember(groupNumber);
 
-        if(getRow.isEmpty()) {
-            return null;
-        } else {
-            List<MemberDto> members = new ArrayList<MemberDto>();
-            for(MemberEntity row : getRow) {
-                members.add(MemberDto.builder().memId(row.getMemId()).profilePicture(row.getProfilePicture()).nickname(row.getNickname()).build());
-            }
-            return members;
+        List<MemberDto> members = new ArrayList<MemberDto>();
+        for(MemberEntity row : getRow) {
+            members.add(MemberDto.builder().memId(row.getMemId()).profilePicture(row.getProfilePicture()).nickname(row.getNickname()).build());
         }
+        return members;
     }
 
     // 그룹 상세 프로필
@@ -75,6 +88,41 @@ public class GroupServiceImpl implements GroupService {
     public GroupDto groupProfile(int groupNumber) {
         Optional<GroupEntity> getRow = groupRepository.findById(groupNumber);
         return getRow.get().toDto();
+    }
+
+    // 메인페이지 그룹 초대
+    @Override
+    public List<GroupDto> mainInvite(String loginId) {
+        List<GroupEntity> getRow = groupRepository.findGroupInvite(loginId);
+
+        List<GroupDto> groups = new ArrayList<GroupDto>();
+        for(GroupEntity row : getRow) {
+            groups.add(GroupDto.builder()
+                    .groupNumber(row.getGroupNumber())
+                    .groupName(row.getGroupName())
+                    .groupSubject(row.getGroupSubject())
+                    .groupImage(row.getGroupImage())
+                    .build());
+        }
+        return groups;
+    }
+
+    @Override
+    public List<Object[]> inviteMember(int groupNumber) {
+        List<Object[]> getRow = groupRepository.findInviteMember(groupNumber);
+        return getRow;
+    }
+
+    @Override
+    public void inviteResponse(GroupPersonDto groupPersonDto, boolean response) {
+        GroupPersonEntity groupPersonEntity = groupPersonDto.toEntity();
+        if(response) {
+            groupPersonEntity.setPersonStatus("2");
+            groupPersonRepository.save(groupPersonEntity);
+        } else {
+            groupPersonRepository.delete(groupPersonEntity);
+        }
+
     }
 }
 

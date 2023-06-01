@@ -10,7 +10,7 @@ public interface FriendService {
     MemberDto myProfile(String loginId);
     List<MemberDto> friendList(String loginId);
     List<MemberDto> findFriends(String loginId, String friendName);
-    List<Object[]> friendProfile(FriendDto friendDto);
+    List<Object> friendProfile(FriendDto friendDto);
     List<Object> searchId(FriendDto friendDto);
     void addFriend(FriendDto friendDto);
 }
