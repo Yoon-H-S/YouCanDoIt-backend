@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface GroupRepository extends JpaRepository<GroupEntity, Integer> { // <>안에는 Entity, Primarykey를 넣어준다.
     // 그룹 목록
@@ -23,4 +25,6 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Integer> { /
             "join MemberEntity m on p.memId = m.memId " +
             "where p.groupNumber=:groupNumber order by p.personStatus")
     List<MemberEntity> findGroupMember(@Param("groupNumber")int groupNumber);
+
+    Optional<GroupEntity> findByGroupSubjectAndGroupNameAndGroupStartdateAndGroupEnddateAndGroupImage(String groupSubject, String groupName, Date groupStartdate, Date groupEnddate, String groupImage);
 }
