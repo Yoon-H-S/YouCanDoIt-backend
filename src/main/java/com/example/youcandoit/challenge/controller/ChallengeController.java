@@ -66,16 +66,17 @@ public class ChallengeController {
         return memberDto;
     }
 
-//    // api/challenge-api/challenge-reservation
-//    // 예약된 챌린지
-//    @PostMapping("challenge-reservation")
-//    public List<GroupDto> challengeReservation(GroupDto gDto) {
-//        List<GroupDto> groupDto = challengeService.challengeReservation();
-//
-//        if (groupDto == null)
-//            return null;
-//        return groupDto;
-//    }
+    // api/challenge-api/challenge-reservation
+    // 예약된 챌린지
+    @PostMapping("challenge-reservation")
+    public List<GroupDto> challengeReservation(HttpSession session) {
+        String loginId = (String)session.getAttribute("loginId");
+        List<GroupDto> groupDto = challengeService.challengeReservation(loginId);
+
+        if (groupDto == null)
+            return null;
+        return groupDto;
+    }
 
 //    // api/challenge-api/daily-ranking
 //    // 갓생 챌린지 > 일일 랭킹
