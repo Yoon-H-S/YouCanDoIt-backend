@@ -21,14 +21,6 @@ public class ChallengeServiceImpl implements ChallengeService {
     // 예약된 챌린지
     @Override
     public GroupDto challengeReservation(GroupDto gDto) {
-        Optional<GroupEntity> getRow = groupRepository.findByGroupSubjectAndGroupNameAndGroupStartdateAndGroupEnddateAndGroupImage(gDto.getGroupSubject(), gDto.getGroupName(), gDto.getGroupStartdate(), gDto.getGroupEnddate(), gDto.getGroupImage());
-
-        if (getRow.isEmpty())  {
-            return null;
-        } else {
-            return getRow.get().toDto();
-        }
+        return null;
     }
-
-
 }

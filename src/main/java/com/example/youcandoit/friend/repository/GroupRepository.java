@@ -40,8 +40,6 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Integer> { /
             "order by p.personStatus, m.nickname")
     List<MemberEntity> findGroupMember(@Param("groupNumber")int groupNumber);
 
-    Optional<GroupEntity> findByGroupSubjectAndGroupNameAndGroupStartdateAndGroupEnddateAndGroupImage(String groupSubject, String groupName, Date groupStartdate, Date groupEnddate, String groupImage);
-
     // 메인페이지 그룹초대
     @Query(value = "select g from GroupPersonEntity p " +
             "join GroupEntity g on p.groupNumber = g.groupNumber " +
@@ -56,4 +54,9 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Integer> { /
             "order by p.personStatus, m.nickname")
     List<Object[]> findInviteMember(@Param("groupNumber")int groupNumber);
 
+    // 예약된 챌린지
+    @Query(value = "select g from GroupPersonEntity p " +
+            "join GroupEntity g on p.groupNumber = g.groupNumber" +
+            "where p.memId=:loginId p.")
+    List<GroupEntity> findGroupReservation(@Param("groupNumber")int groupNumber);
 }
