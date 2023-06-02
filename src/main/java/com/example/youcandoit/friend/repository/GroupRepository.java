@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,4 +53,10 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Integer> { /
             "where p.groupNumber=:groupNumber " +
             "order by p.personStatus, m.nickname")
     List<Object[]> findInviteMember(@Param("groupNumber")int groupNumber);
+
+    // 예약된 챌린지
+    @Query(value = "select g from GroupPersonEntity p " +
+            "join GroupEntity g on p.groupNumber = g.groupNumber" +
+            "where p.memId=:loginId p.")
+    List<GroupEntity> findGroupReservation(@Param("groupNumber")int groupNumber);
 }

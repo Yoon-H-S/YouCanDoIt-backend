@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.sql.Date;
@@ -39,6 +40,7 @@ public class GroupEntity {
     @Column(name = "group_class")
     private String groupClass;
     @Column(name = "group_state")
+    @ColumnDefault("1") // default 1
     private String groupState;
 
     public GroupDto toDto() {
