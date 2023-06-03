@@ -30,33 +30,18 @@ public class ChallengeController {
         return myRank;
     }
 
-    // api/challenge-api/godlife-challenge
-    // 갓생 챌린지
-    @PostMapping("/godlife-challenge")
-    public GodlifeChallengeDto godLifeChallenge(@RequestBody GodlifeChallengeDto gcDto) {
-        GodlifeChallengeDto godlifeChallengeDto = challengeService.godLifeChallenge(gcDto);
-
-        if (godlifeChallengeDto == null)
-            return null;
-        return godlifeChallengeDto;
+    // api/challenge-api/godlife-challenge-list
+    // 갓생 챌린지 목록
+    @GetMapping("/godlife-challenge-list")
+    public List<GodlifeChallengeDto> godLifeChallenge() {
+        return challengeService.godLifeChallenge();
     }
 
     // api/challenge-api/godlife-challenge-detail
     // 갓생 챌린지 상세보기
-    @PostMapping("/godlife-challenge-detail")
-    public GodlifeChallengeDto godLifeChallengeDetail(@RequestBody GodlifeChallengeDto gcDto) {
-        GodlifeChallengeDto godlifeChallengeDto = challengeService.godLifeChallengeDetail(gcDto);
-
-        if (godlifeChallengeDto == null)
-            return null;
-        return godlifeChallengeDto;
-    }
-
-    // api/challenge-api/godlife-challenge-create
-    // 갓생 챌린지 생성하기
-    @PostMapping("/godlife-challenge-create")
-    public void godLifeChallengeCreate(@RequestBody GroupDto gDto) {
-        challengeService.saveGodlifeChallenge(gDto);
+    @GetMapping("/godlife-challenge-detail")
+    public GodlifeChallengeDto godLifeChallengeDetail(@RequestParam String subject) {
+        return challengeService.godLifeChallengeDetail(subject);
     }
 
     // api/challenge-api/with-friend
@@ -69,6 +54,23 @@ public class ChallengeController {
         if (memberDto == null)
             return null;
         return memberDto;
+    }
+
+    // api/challenge-api/challenge-create
+    // 갓생 챌린지 생성하기
+    @PostMapping("/challenge-create")
+    public void godLifeChallengeCreate(@RequestBody GroupDto groupDto, HttpSession session) {
+        int groupNumber = challengeService.saveGodlifeChallenge(groupDto);
+        session.setAttribute("groupNumber", groupNumber);
+    }
+
+    // 그룹 인원 생성하기
+    @GetMapping("/group-person-create")
+    public void groupPersonCreate(@RequestParam String[] members, HttpSession session) {
+        int groupNumber = (int)session.getAttribute("groupNumber");
+        String loginId = (String)session.getAttribute("loginId");
+        challengeService.saveGroupPerson(groupNumber, loginId, members);
+        session.removeAttribute("groupNumber");
     }
 
     // api/challenge-api/challenge-reservation

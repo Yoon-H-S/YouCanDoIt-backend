@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
@@ -17,6 +18,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @AllArgsConstructor
 @Builder
 @Table(name = "godlife_challenge") // db의 해당 테이블과 연결
+@DynamicInsert
 @DynamicUpdate
 public class GodlifeChallengeEntity {
     @Id

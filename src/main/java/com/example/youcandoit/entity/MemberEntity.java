@@ -3,6 +3,7 @@ package com.example.youcandoit.entity;
 import com.example.youcandoit.dto.MemberDto;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.sql.Date;
@@ -13,6 +14,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @Builder
 @Table(name = "member") // db의 해당 테이블과 연결
+@DynamicInsert
 @DynamicUpdate
 public class MemberEntity {
     @Id

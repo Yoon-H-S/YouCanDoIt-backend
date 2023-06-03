@@ -1,5 +1,6 @@
 package com.example.youcandoit.challenge.service.impl;
 
+import com.example.youcandoit.entity.GroupPersonEntity;
 import com.example.youcandoit.repository.GodLifeChallengeRepository;
 import com.example.youcandoit.challenge.service.ChallengeService;
 import com.example.youcandoit.dto.GodlifeChallengeDto;
@@ -76,33 +77,23 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     // 갓생 챌린지
     @Override
-    public GodlifeChallengeDto godLifeChallenge(GodlifeChallengeDto gcDto) {
-        Optional<GodlifeChallengeEntity> getRow = godLifeChallengeRepository.findByChallengeSubjectAndChallengeImageAndChallengeContentsAndChallengeCategory(gcDto.getChallengeSubject(), gcDto.getChallengeImage(), gcDto.getChallengeContents(), gcDto.getChallengeCategory());
+    public List<GodlifeChallengeDto> godLifeChallenge() {
+        List<GodlifeChallengeEntity> getRow = godLifeChallengeRepository.findAll();
 
-        if(getRow.isEmpty()) {
-            return null;
-        } else {
-            return getRow.get().toDto(); // Entity -> Dto로 변환
+        List<GodlifeChallengeDto> godlifeList = new ArrayList<GodlifeChallengeDto>();
+        for(GodlifeChallengeEntity row : getRow) {
+            godlifeList.add(row.toDto());
         }
+
+        return godlifeList;
     }
 
     // 갓생 챌린지 상세보기
     @Override
-    public GodlifeChallengeDto godLifeChallengeDetail(GodlifeChallengeDto gcDto) {
-        Optional<GodlifeChallengeEntity> getRow = godLifeChallengeRepository.findByChallengeSubjectAndChallengeContents(gcDto.getChallengeSubject(), gcDto.getChallengeContents());
+    public GodlifeChallengeDto godLifeChallengeDetail(String challengeSubject) {
+        Optional<GodlifeChallengeEntity> getRow = godLifeChallengeRepository.findById(challengeSubject);
 
-        if(getRow.isEmpty()) {
-            return null;
-        } else {
-            return getRow.get().toDto();
-        }
-    }
-
-    // 갓생 챌린지 생성하기
-    @Override
-    public void saveGodlifeChallenge(GroupDto gDto) {
-        GroupEntity groupEntity = gDto.toEntity();
-        groupRepository.save(groupEntity);
+        return getRow.get().toDto();
     }
 
     // 갓생 챌린지 생성하기 > 함께할 친구 선택
@@ -119,5 +110,28 @@ public class ChallengeServiceImpl implements ChallengeService {
             }
             return friends;
         }
+    }
+
+    // 갓생 챌린지 생성하기
+    @Override
+    public int saveGodlifeChallenge(GroupDto groupDto) {
+        GroupEntity groupEntity = groupDto.toEntity();
+        int groupNumber = groupRepository.save(groupEntity).getGroupNumber();
+
+        return groupNumber;
+    }
+
+    // 그룹 인원 생성하기
+    @Override
+    public void saveGroupPerson(int groupMember, String loginId, String[] members) {
+        GroupPersonEntity groupPersonEntity = GroupPersonEntity.builder().groupNumber(groupMember).build();
+        for(String member : members) {
+            groupPersonEntity.setMemId(member);
+            groupPersonRepository.save(groupPersonEntity);
+        }
+
+        groupPersonEntity.setMemId(loginId);
+        groupPersonEntity.setPersonStatus("1");
+        groupPersonRepository.save(groupPersonEntity);
     }
 }

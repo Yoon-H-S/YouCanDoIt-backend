@@ -11,9 +11,10 @@ public interface ChallengeService {
     List<GroupDto> challengeReservation(String loginId);
     List<MemberDto> withFriend(String loginId);
 
-    GodlifeChallengeDto godLifeChallenge(GodlifeChallengeDto gcDto);
+    List<GodlifeChallengeDto> godLifeChallenge();
 
-    GodlifeChallengeDto godLifeChallengeDetail(GodlifeChallengeDto gcDto);
+    GodlifeChallengeDto godLifeChallengeDetail(String challengeSubject);
 
-    void saveGodlifeChallenge(GroupDto gDto);
+    int saveGodlifeChallenge(GroupDto groupDto);
+    void saveGroupPerson(int groupMember, String loginId, String[] members);
 }

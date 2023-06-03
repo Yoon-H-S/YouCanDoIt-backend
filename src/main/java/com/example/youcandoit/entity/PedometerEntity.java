@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.sql.Date;
@@ -18,6 +19,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @Builder
 @Table(name = "pedometer") // db의 해당 테이블과 연결
+@DynamicInsert
 @DynamicUpdate
 @IdClass(PedometerId.class)
 public class PedometerEntity {

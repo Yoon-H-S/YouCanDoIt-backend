@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.sql.Date;
@@ -17,6 +18,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @Builder
 @Table(name = "challenge_group") // db의 해당 테이블과 연결
+@DynamicInsert
 @DynamicUpdate
 public class GroupEntity {
     @Id
@@ -40,7 +42,6 @@ public class GroupEntity {
     @Column(name = "group_class")
     private String groupClass;
     @Column(name = "group_state")
-    @ColumnDefault("1") // default 1
     private String groupState;
 
     public GroupDto toDto() {
