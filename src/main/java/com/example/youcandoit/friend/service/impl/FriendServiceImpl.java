@@ -1,14 +1,12 @@
 package com.example.youcandoit.friend.service.impl;
 
 import com.example.youcandoit.dto.FriendDto;
-import com.example.youcandoit.dto.GroupDto;
 import com.example.youcandoit.dto.MemberDto;
 import com.example.youcandoit.entity.FriendEntity;
-import com.example.youcandoit.entity.GroupEntity;
-import com.example.youcandoit.friend.repository.FriendRepository;
+import com.example.youcandoit.repository.FriendRepository;
 import com.example.youcandoit.friend.service.FriendService;
 import com.example.youcandoit.entity.MemberEntity;
-import com.example.youcandoit.member.repository.MemberRepository;
+import com.example.youcandoit.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

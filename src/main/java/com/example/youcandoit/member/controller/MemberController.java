@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.net.*;
 import java.security.*;
+import java.sql.Date;
 import java.util.*;
 import java.time.LocalDate;
 
@@ -56,7 +57,7 @@ public class MemberController {
     public void createMember(@RequestBody MemberDto memberDto) {
         String defaultProfilePicture = "/profilePicture/profile" + ((int)(Math.random() * 16) + 1) + ".png";
         memberDto.setProfilePicture(defaultProfilePicture);
-        memberDto.setJoinDate(String.valueOf(LocalDate.now()));
+        memberDto.setJoinDate(Date.valueOf(LocalDate.now()));
         memberService.saveMember(memberDto);
     }
 

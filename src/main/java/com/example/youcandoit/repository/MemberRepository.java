@@ -1,4 +1,4 @@
-package com.example.youcandoit.member.repository;
+package com.example.youcandoit.repository;
 
 import com.example.youcandoit.entity.MemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

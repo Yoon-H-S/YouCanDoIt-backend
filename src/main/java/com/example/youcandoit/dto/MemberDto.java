@@ -3,6 +3,8 @@ package com.example.youcandoit.dto;
 import com.example.youcandoit.entity.MemberEntity;
 import lombok.*;
 
+import java.sql.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,7 +15,7 @@ public class MemberDto {
     private String nickname;
     private String phoneNumber;
     private String profilePicture;
-    private String joinDate;
+    private Date joinDate;
     private String memClass;
 
     public MemberEntity toEntity() {

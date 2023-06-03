@@ -1,4 +1,4 @@
-package com.example.youcandoit.friend.repository;
+package com.example.youcandoit.repository;
 
 
 import com.example.youcandoit.entity.GroupEntity;

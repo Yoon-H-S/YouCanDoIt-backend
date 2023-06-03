@@ -6,8 +6,8 @@ import com.example.youcandoit.dto.MemberDto;
 import com.example.youcandoit.entity.GroupEntity;
 import com.example.youcandoit.entity.GroupPersonEntity;
 import com.example.youcandoit.entity.MemberEntity;
-import com.example.youcandoit.friend.repository.GroupPersonRepository;
-import com.example.youcandoit.friend.repository.GroupRepository;
+import com.example.youcandoit.repository.GroupPersonRepository;
+import com.example.youcandoit.repository.GroupRepository;
 import com.example.youcandoit.friend.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -122,7 +122,6 @@ public class GroupServiceImpl implements GroupService {
         } else {
             groupPersonRepository.delete(groupPersonEntity);
         }
-
     }
 }
 

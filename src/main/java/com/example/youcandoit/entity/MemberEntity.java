@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.sql.Date;
+
 @Entity // 이 클래스는 엔티티이다.
 @Data
 @NoArgsConstructor
@@ -25,7 +27,7 @@ public class MemberEntity {
     @Column(name = "profile_picture")
     private String profilePicture;
     @Column(name = "join_date")
-    private String joinDate;
+    private Date joinDate;
     @Column(name = "mem_class")
     private String memClass;
 

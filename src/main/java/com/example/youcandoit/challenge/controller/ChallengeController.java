@@ -1,8 +1,6 @@
 package com.example.youcandoit.challenge.controller;
 
 import com.example.youcandoit.challenge.service.ChallengeService;
-import com.example.youcandoit.challenge.service.DailyRankingService;
-import com.example.youcandoit.challenge.service.GodLifeChallengeService;
 import com.example.youcandoit.dto.GodlifeChallengeDto;
 import com.example.youcandoit.dto.GroupDto;
 import com.example.youcandoit.dto.MemberDto;
@@ -16,20 +14,27 @@ import java.util.List;
 @RestController
 @RequestMapping("api/challenge-api")
 public class ChallengeController {
-    GodLifeChallengeService godLifeChallengeService;
     ChallengeService challengeService;
 
     @Autowired
-    public ChallengeController(GodLifeChallengeService godLifeChallengeService, ChallengeService challengeService) {
-        this.godLifeChallengeService = godLifeChallengeService;
+    public ChallengeController(ChallengeService challengeService) {
         this.challengeService = challengeService;
+    }
+
+
+    // 메인페이지 나의랭킹
+    @GetMapping("my-ranking")
+    public List<Object[]> myRanking(HttpSession session) {
+        String loginId = (String)session.getAttribute("loginId");
+        List<Object[]> myRank = challengeService.myRanking(loginId);
+        return myRank;
     }
 
     // api/challenge-api/godlife-challenge
     // 갓생 챌린지
     @PostMapping("/godlife-challenge")
     public GodlifeChallengeDto godLifeChallenge(@RequestBody GodlifeChallengeDto gcDto) {
-        GodlifeChallengeDto godlifeChallengeDto = godLifeChallengeService.godLifeChallenge(gcDto);
+        GodlifeChallengeDto godlifeChallengeDto = challengeService.godLifeChallenge(gcDto);
 
         if (godlifeChallengeDto == null)
             return null;
@@ -40,7 +45,7 @@ public class ChallengeController {
     // 갓생 챌린지 상세보기
     @PostMapping("/godlife-challenge-detail")
     public GodlifeChallengeDto godLifeChallengeDetail(@RequestBody GodlifeChallengeDto gcDto) {
-        GodlifeChallengeDto godlifeChallengeDto = godLifeChallengeService.godLifeChallengeDetail(gcDto);
+        GodlifeChallengeDto godlifeChallengeDto = challengeService.godLifeChallengeDetail(gcDto);
 
         if (godlifeChallengeDto == null)
             return null;
@@ -51,7 +56,7 @@ public class ChallengeController {
     // 갓생 챌린지 생성하기
     @PostMapping("/godlife-challenge-create")
     public void godLifeChallengeCreate(@RequestBody GroupDto gDto) {
-        godLifeChallengeService.saveGodlifeChallenge(gDto);
+        challengeService.saveGodlifeChallenge(gDto);
     }
 
     // api/challenge-api/with-friend
@@ -59,7 +64,7 @@ public class ChallengeController {
     @GetMapping("with-friend")
     public List<MemberDto> withFriend(HttpSession session) {
         String loginId = (String) session.getAttribute("loginId");
-        List<MemberDto> memberDto = godLifeChallengeService.withFriend(loginId);
+        List<MemberDto> memberDto = challengeService.withFriend(loginId);
 
         if (memberDto == null)
             return null;

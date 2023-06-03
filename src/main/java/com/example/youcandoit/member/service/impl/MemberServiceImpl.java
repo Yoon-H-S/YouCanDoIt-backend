@@ -3,7 +3,7 @@ package com.example.youcandoit.member.service.impl;
 import com.example.youcandoit.dto.MemberDto;
 import com.example.youcandoit.entity.MemberEntity;
 import com.example.youcandoit.member.service.MemberService;
-import com.example.youcandoit.member.repository.MemberRepository;
+import com.example.youcandoit.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;

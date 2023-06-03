@@ -1,4 +1,4 @@
-package com.example.youcandoit.challenge.repository;
+package com.example.youcandoit.repository;
 
 import com.example.youcandoit.entity.GroupEntity;
 import com.example.youcandoit.entity.Id.PedometerRankingId;
