@@ -100,9 +100,9 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Integer> { /
     List<Object[]> findRankingDetail(@Param("groupNumber")int groupNumber);
 
     // 예약된 챌린지
-    @Query(value = "select g from GroupPersonEntity p " +
-            "join GroupEntity g on p.groupNumber = g.groupNumber " +
-            "where p.memId=:loginId and g.groupState=1 " +
+    @Query(value = "select g from GroupEntity g " +
+            "join GroupPersonEntity p on p.groupNumber = g.groupNumber " +
+            "where p.memId=:loginId and g.groupState=1 and (p.personStatus=1 or p.personStatus=2)" +
             "order by g.groupStartdate")
     List<GroupEntity> findChallengeReservation(@Param("loginId")String loginId);
 }

@@ -125,7 +125,6 @@ public class ChallengeServiceImpl implements ChallengeService {
         List<GroupDto> groups = new ArrayList<GroupDto>();
         for(GroupEntity row : getRow) {
             groups.add(GroupDto.builder()
-                    .groupState(row.getGroupState())
                     .groupSubject(row.getGroupSubject())
                     .groupName(row.getGroupName())
                     .groupStartdate(row.getGroupStartdate())

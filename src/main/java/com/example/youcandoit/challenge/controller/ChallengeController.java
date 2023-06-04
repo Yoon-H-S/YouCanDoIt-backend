@@ -112,4 +112,8 @@ public class ChallengeController {
         return groupDto;
     }
 
+
+    // test(주기적으로 변경되어야 할 사항)
+
+
 }
