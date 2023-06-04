@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.swing.*;
+import java.sql.Date;
 import java.util.List;
 
 @RestController
@@ -28,6 +29,32 @@ public class ChallengeController {
         String loginId = (String)session.getAttribute("loginId");
         List<Object[]> myRank = challengeService.myRanking(loginId);
         return myRank;
+    }
+
+    // 갓생 챌린지 일일랭킹 목록
+    @GetMapping("daily-ranking")
+    public List<Object[]> DailyRanking(HttpSession session) {
+        String loginId = (String)session.getAttribute("loginId");
+        return challengeService.dailyRanking(loginId);
+    }
+
+    // 갓생 챌린지 일일랭킹 상세
+    @GetMapping("daily-ranking-detail")
+    public List<Object> dailyRankingDetail(int groupNumber, Date date) {
+        return challengeService.dailyRankingDetail(groupNumber, date);
+    }
+
+    // 갓생 챌린지 누적랭킹 목록
+    @GetMapping("godlife-ranking")
+    public List<Object[]> godlifeRanking(HttpSession session) {
+        String loginId = (String)session.getAttribute("loginId");
+        return challengeService.accumulateRanking(loginId);
+    }
+
+    // 갓생 챌린지 누적랭킹 상세
+    @GetMapping("godlife-ranking-detail")
+    public List<Object> godlifeRankingDetail(int groupNumber) {
+        return challengeService.accumulateRankingDetail(groupNumber);
     }
 
     // api/challenge-api/godlife-challenge-list
@@ -84,10 +111,5 @@ public class ChallengeController {
             return null;
         return groupDto;
     }
-
-//    // api/challenge-api/daily-ranking
-//    // 갓생 챌린지 > 일일 랭킹
-//    @PostMapping("daily-ranking")
-//    public
 
 }

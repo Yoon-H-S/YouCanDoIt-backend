@@ -1,7 +1,7 @@
 package com.example.youcandoit.challenge.service.impl;
 
 import com.example.youcandoit.entity.GroupPersonEntity;
-import com.example.youcandoit.repository.GodLifeChallengeRepository;
+import com.example.youcandoit.repository.*;
 import com.example.youcandoit.challenge.service.ChallengeService;
 import com.example.youcandoit.dto.GodlifeChallengeDto;
 import com.example.youcandoit.dto.GroupDto;
@@ -9,9 +9,6 @@ import com.example.youcandoit.dto.MemberDto;
 import com.example.youcandoit.entity.GodlifeChallengeEntity;
 import com.example.youcandoit.entity.GroupEntity;
 import com.example.youcandoit.entity.MemberEntity;
-import com.example.youcandoit.repository.FriendRepository;
-import com.example.youcandoit.repository.GroupPersonRepository;
-import com.example.youcandoit.repository.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +51,70 @@ public class ChallengeServiceImpl implements ChallengeService {
             myRankData.add(new Object[]{groupDto.getGroupName(), groupDto.getGroupSubject(), groupDto.getGroupImage(), dDay, row[1]});
         }
         return myRankData;
+    }
+
+    // 갓생챌린지 일일랭킹
+    @Override
+    public List<Object[]> dailyRanking(String loginId) {
+        Date date = Date.valueOf(LocalDate.now());
+        List<GroupEntity> getRow = groupRepository.findRankingList(loginId);
+
+        if(getRow.isEmpty()) {
+            return null;
+        }
+
+        List<Object[]> rankingList = new ArrayList<Object[]>();
+        for(GroupEntity row : getRow) {
+            List<Object[]> getRow2 = groupRepository.findDailyRanking(row.getGroupNumber(), date);
+            rankingList.add(new Object[]{row.getGroupNumber(), row.getGroupSubject(), getRow2});
+        }
+        return rankingList;
+    }
+
+    // 갓생챌린지 일일랭킹 상세
+    @Override
+    public List<Object> dailyRankingDetail(int groupNumber, Date date) {
+        Optional<GroupEntity> getRow = groupRepository.findById(groupNumber);
+        List<Object[]> getRow2 = groupRepository.findDailyRankingDetail(groupNumber, date);
+
+        GroupDto groupDto = GroupDto.builder().groupSubject(getRow.get().getGroupSubject()).groupName(getRow.get().getGroupName()).build();
+        List<Object> ranking = new ArrayList<Object>();
+        ranking.add(groupDto);
+        ranking.add(getRow2);
+
+        return ranking;
+    }
+
+    // 갓생챌린지 누적랭킹
+    @Override
+    public List<Object[]> accumulateRanking(String loginId) {
+        List<GroupEntity> getRow = groupRepository.findRankingList(loginId);
+
+        if(getRow.isEmpty()) {
+            return null;
+        }
+
+        List<Object[]> rankingList = new ArrayList<Object[]>();
+        for(GroupEntity row : getRow) {
+            List<Object[]> getRow2 = groupRepository.findRanking(row.getGroupNumber());
+            GroupDto groupDto = row.toDto();
+            rankingList.add(new Object[]{groupDto.getGroupNumber(), groupDto.getGroupSubject(), getRow2});
+        }
+        return rankingList;
+    }
+
+    // 갓생챌린지 누적랭킹 상세
+    @Override
+    public List<Object> accumulateRankingDetail(int groupNumber) {
+        Optional<GroupEntity> getRow = groupRepository.findById(groupNumber);
+        List<Object[]> getRow2 = groupRepository.findRankingDetail(groupNumber);
+
+        GroupDto groupDto = GroupDto.builder().groupSubject(getRow.get().getGroupSubject()).groupName(getRow.get().getGroupName()).build();
+        List<Object> ranking = new ArrayList<Object>();
+        ranking.add(groupDto);
+        ranking.add(getRow2);
+
+        return ranking;
     }
 
     // 예약된 챌린지
