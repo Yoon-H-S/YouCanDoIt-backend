@@ -94,7 +94,7 @@ public class ChallengeController {
         groupDto.setGroupImage(defaultGroupImage);
         String loginId = (String)session.getAttribute("loginId");
         int groupNumber = challengeService.saveGodlifeChallenge(groupDto, loginId, members);
-        return 1;
+        return groupNumber;
     }
 
     // 그룹 이미지
@@ -102,8 +102,8 @@ public class ChallengeController {
     public void insertGroupImage(@RequestParam int groupNumber, @RequestPart MultipartFile file) {
         String fileName = file.getOriginalFilename();
         String extension = fileName.substring(fileName.length()-4); // 확장자 추출
-        String dbName = "/groupImage/" + groupNumber + "Image" + extension; //  db에 저장될 경로, 저장명 지정
-        String saveName = "/home/yun/ycdi/build/groupImage/" + groupNumber + "Image" + extension; // 실제 저장경로, 저장명 지정
+        String dbName = "/groupImage/"+ "Image" + groupNumber  + extension; //  db에 저장될 경로, 저장명 지정
+        String saveName = "/home/yun/ycdi/build/groupImage/" + "Image" + groupNumber + extension; // 실제 저장경로, 저장명 지정
 
         try {
             file.transferTo(new File(saveName)); // 파일 저장
