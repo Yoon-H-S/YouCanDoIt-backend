@@ -320,6 +320,7 @@ public class ChallengeServiceImpl implements ChallengeService {
                     .groupNumber(row.getGroupNumber())
                     .memId(row.getMemId())
                     .pedometerResult(0)
+                    .pedometerRank(0)
                     .build();
             pedometerRankingRepository.save(pedometerRankingEntity);
         }
