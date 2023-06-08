@@ -16,8 +16,8 @@ public interface ChallengeService {
 
     GodlifeChallengeDto godLifeChallengeDetail(String challengeSubject);
 
-    int saveGodlifeChallenge(GroupDto groupDto);
-    void saveGroupPerson(int groupMember, String loginId, String[] members);
+    int saveGodlifeChallenge(GroupDto groupDto, String loginId, String[] members);
+    void saveGroupImage(GroupDto groupDto);
     List<Object[]> dailyRanking(String loginId);
     List<Object> dailyRankingDetail(int groupNumber, Date date);
     List<Object[]> accumulateRanking(String loginId);

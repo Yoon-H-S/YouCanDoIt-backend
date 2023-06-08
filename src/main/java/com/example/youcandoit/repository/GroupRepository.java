@@ -2,7 +2,9 @@ package com.example.youcandoit.repository;
 
 import com.example.youcandoit.entity.GroupEntity;
 import com.example.youcandoit.entity.MemberEntity;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -56,6 +58,13 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Integer> { /
             "order by p.personStatus, m.nickname")
     List<Object[]> findInviteMember(@Param("groupNumber")int groupNumber);
 
+    // 그룹멤버 증가
+    @Transactional
+    @Modifying
+    @Query(value = "update GroupEntity set groupHeadcount=groupHeadcount+1 " +
+            "where groupNumber=:groupNumber")
+    void updateGroupMember(@Param("groupNumber")int groupNumber);
+
     /*
     =========================================챌린지=========================================================
      */
@@ -73,15 +82,15 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Integer> { /
             "join MemberEntity m on m.memId = p.memId " +
             "where p.groupNumber=:groupNumber and r.pedometerDate=:date " +
             "order by r.pedometerRank limit 3")
-    List<Object[]> findDailyRanking(@Param("groupNumber")int groupNumber, @Param("date") Date date);
+    List<Object[]> findDailyRanking(@Param("groupNumber")int groupNumber, @Param("date")Date date);
 
     // 일일랭킹 상세의 순위
-    @Query(value = "select m.nickname, m.profilePicture, r.pedometerResult from GroupPersonEntity p " +
+    @Query(value = "select m.nickname, m.profilePicture, r.pedometerResult, r.pedometerRank from GroupPersonEntity p " +
             "join PedometerRankingEntity r on r.groupNumber = p.groupNumber and r.memId = p.memId " +
             "join MemberEntity m on m.memId = p.memId " +
             "where p.groupNumber=:groupNumber and r.pedometerDate=:date " +
             "order by r.pedometerRank")
-    List<Object[]> findDailyRankingDetail(@Param("groupNumber")int groupNumber, @Param("date") Date date);
+    List<Object[]> findDailyRankingDetail(@Param("groupNumber")int groupNumber, @Param("date")Date date);
 
     // 누적랭킹 리스트의 순위
     @Query(value = "select m.profilePicture, a.pedometerCount from GroupPersonEntity p " +
@@ -92,7 +101,7 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Integer> { /
     List<Object[]> findRanking(@Param("groupNumber")int groupNumber);
 
     // 누적랭킹 상세의 순위
-    @Query(value = "select m.nickname, m.profilePicture, a.pedometerCount from GroupPersonEntity p " +
+    @Query(value = "select m.nickname, m.profilePicture, a.pedometerCount, a.pedoaccuRank from GroupPersonEntity p " +
             "join PedometerAccumulateEntity a on a.groupNumber = p.groupNumber and a.memId = p.memId " +
             "join MemberEntity m on m.memId = p.memId " +
             "where p.groupNumber=:groupNumber " +
@@ -105,4 +114,20 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Integer> { /
             "where p.memId=:loginId and g.groupState=1 and (p.personStatus=1 or p.personStatus=2)" +
             "order by g.groupStartdate")
     List<GroupEntity> findChallengeReservation(@Param("loginId")String loginId);
+
+    /*
+    =========================================자정에 동작하는 데이터베이스 업데이트=========================================================
+     */
+
+    // 그룹 종료
+    @Transactional
+    @Modifying
+    @Query(value = "update GroupEntity set groupState='3' where groupEnddate=:date")
+    void updateGroupEnd(@Param("date")Date date);
+
+    // 그룹 시작
+    @Transactional
+    @Modifying
+    @Query(value = "update GroupEntity set groupState='2' where groupStartdate=:date")
+    void updateGroupStart(@Param("date")Date date);
 }

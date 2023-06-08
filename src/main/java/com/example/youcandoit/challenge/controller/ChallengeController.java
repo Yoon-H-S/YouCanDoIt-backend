@@ -7,8 +7,11 @@ import com.example.youcandoit.dto.MemberDto;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
 
@@ -86,18 +89,32 @@ public class ChallengeController {
     // api/challenge-api/challenge-create
     // 갓생 챌린지 생성하기
     @PostMapping("/challenge-create")
-    public void godLifeChallengeCreate(@RequestBody GroupDto groupDto, HttpSession session) {
-        int groupNumber = challengeService.saveGodlifeChallenge(groupDto);
-        session.setAttribute("groupNumber", groupNumber);
+    public int godLifeChallengeCreate(@RequestBody GroupDto groupDto, @RequestParam String[] members, HttpSession session) {
+        String defaultGroupImage = "/groupImage/defaultGroup.png";
+        groupDto.setGroupImage(defaultGroupImage);
+        String loginId = (String)session.getAttribute("loginId");
+        int groupNumber = challengeService.saveGodlifeChallenge(groupDto, loginId, members);
+        return 1;
     }
 
-    // 그룹 인원 생성하기
-    @GetMapping("/group-person-create")
-    public void groupPersonCreate(@RequestParam String[] members, HttpSession session) {
-        int groupNumber = (int)session.getAttribute("groupNumber");
-        String loginId = (String)session.getAttribute("loginId");
-        challengeService.saveGroupPerson(groupNumber, loginId, members);
-        session.removeAttribute("groupNumber");
+    // 그룹 이미지
+    @PostMapping("/insert-group-image")
+    public void insertGroupImage(@RequestParam int groupNumber, @RequestPart MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        String extension = fileName.substring(fileName.length()-4); // 확장자 추출
+        String dbName = "/groupImage/" + groupNumber + "Image" + extension; //  db에 저장될 경로, 저장명 지정
+        String saveName = "/home/yun/ycdi/build/groupImage/" + groupNumber + "Image" + extension; // 실제 저장경로, 저장명 지정
+
+        try {
+            file.transferTo(new File(saveName)); // 파일 저장
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        GroupDto groupDto = GroupDto.builder()
+                .groupNumber(groupNumber)
+                .groupImage(dbName)
+                .build();
+        challengeService.saveGroupImage(groupDto);
     }
 
     // api/challenge-api/challenge-reservation
@@ -111,9 +128,5 @@ public class ChallengeController {
             return null;
         return groupDto;
     }
-
-
-    // test(주기적으로 변경되어야 할 사항)
-
 
 }

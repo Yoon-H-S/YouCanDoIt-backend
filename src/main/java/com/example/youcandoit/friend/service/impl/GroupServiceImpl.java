@@ -107,18 +107,21 @@ public class GroupServiceImpl implements GroupService {
         return groups;
     }
 
+    // 그룹에 초대된 멤버들
     @Override
     public List<Object[]> inviteMember(int groupNumber) {
         List<Object[]> getRow = groupRepository.findInviteMember(groupNumber);
         return getRow;
     }
 
+    // 그룹초대 수락, 거절
     @Override
     public void inviteResponse(GroupPersonDto groupPersonDto, boolean response) {
         GroupPersonEntity groupPersonEntity = groupPersonDto.toEntity();
         if(response) {
             groupPersonEntity.setPersonStatus("2");
             groupPersonRepository.save(groupPersonEntity);
+            groupRepository.updateGroupMember(groupPersonEntity.getGroupNumber());
         } else {
             groupPersonRepository.delete(groupPersonEntity);
         }
