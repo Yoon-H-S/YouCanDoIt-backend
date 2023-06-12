@@ -209,7 +209,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     =======================================1시간마다 랭킹 업데이트===========================================
      */
 
-    @Scheduled(cron = "0 2 1-23/1 * * *")
+    @Scheduled(cron = "0 1 1-23/1 * * *")
 //    @Scheduled(cron = "0/10 * * * * *")
     public void rankingUpdate() {
         Date today = Date.valueOf(LocalDate.now());
@@ -243,7 +243,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     =======================================자정마다 데이터베이스 업데이트===========================================
      */
 
-    @Scheduled(cron = "0 2 0 * * *")
+    @Scheduled(cron = "0 1 0 * * *")
 //    @Scheduled(cron = "0/10 * * * * *")
     public void databaseUpdate() {
         Date today = Date.valueOf(LocalDate.now());
