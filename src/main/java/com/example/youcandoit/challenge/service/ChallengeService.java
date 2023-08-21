@@ -11,15 +11,12 @@ public interface ChallengeService {
     List<Object[]> myRanking(String loginId);
     List<GroupDto> challengeReservation(String loginId);
     List<MemberDto> withFriend(String loginId);
-
     List<GodlifeChallengeDto> godLifeChallenge();
-
     GodlifeChallengeDto godLifeChallengeDetail(String challengeSubject);
-
-    int saveGodlifeChallenge(GroupDto groupDto, String loginId, String[] members);
+    int saveGodLifeChallenge(GroupDto groupDto, String loginId, String[] members);
     void saveGroupImage(GroupDto groupDto);
-    List<Object[]> dailyRanking(String loginId);
+    List<Object[]> challengeRanking(String loginId,String rankingType);
     List<Object> dailyRankingDetail(int groupNumber, Date date);
-    List<Object[]> accumulateRanking(String loginId);
-    List<Object> accumulateRankingDetail(int groupNumber);
+    List<Object> GodLifeRankingDetail(int groupNumber);
+    List<Object> diyRankingDetail(int groupNumber);
 }

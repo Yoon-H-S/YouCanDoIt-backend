@@ -24,6 +24,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     FriendRepository friendRepository;
     PedometerRankingRepository pedometerRankingRepository;
     PedometerAccumulateRepository pedometerAccumulateRepository;
+    DiyAccumulateRepository diyAccumulateRepository;
 
     @Autowired
     public ChallengeServiceImpl(
@@ -32,13 +33,15 @@ public class ChallengeServiceImpl implements ChallengeService {
             FriendRepository friendRepository,
             GroupPersonRepository groupPersonRepository,
             PedometerRankingRepository pedometerRankingRepository,
-            PedometerAccumulateRepository pedometerAccumulateRepository) {
+            PedometerAccumulateRepository pedometerAccumulateRepository,
+            DiyAccumulateRepository diyAccumulateRepository) {
         this.groupPersonRepository = groupPersonRepository;
         this.godLifeChallengeRepository = godLifeChallengeRepository;
         this.groupRepository = groupRepository;
         this.friendRepository = friendRepository;
         this.pedometerRankingRepository = pedometerRankingRepository;
         this.pedometerAccumulateRepository = pedometerAccumulateRepository;
+        this.diyAccumulateRepository = diyAccumulateRepository;
     }
 
 
@@ -46,7 +49,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Override
     public List<Object[]> myRanking(String loginId) {
         Date date = Date.valueOf(LocalDate.now());
-        List<Object[]> getRow = groupPersonRepository.findGroup(loginId, date);
+        List<Object[]> getRow = pedometerRankingRepository.findMyRankingList(loginId, date);
         List<Object[]> myRankData = new ArrayList<Object[]>();
         for(Object[] row : getRow) {
             GroupDto groupDto = ((GroupEntity)row[0]).toDto();
@@ -57,20 +60,34 @@ public class ChallengeServiceImpl implements ChallengeService {
         return myRankData;
     }
 
-    // 갓생챌린지 일일랭킹
+    // 챌린지 랭킹 리스트 조회
     @Override
-    public List<Object[]> dailyRanking(String loginId) {
-        Date date = Date.valueOf(LocalDate.now());
-        List<GroupEntity> getRow = groupRepository.findRankingList(loginId);
+    public List<Object[]> challengeRanking(String loginId, String rankingType) {
+        System.out.println(rankingType);
+        List<GroupEntity> getRow = groupRepository.findInProgressGroupList(loginId, rankingType.equals("3") ? "2" : "1");
 
         if(getRow.isEmpty()) {
             return null;
         }
 
+        Date date = Date.valueOf(LocalDate.now());
         List<Object[]> rankingList = new ArrayList<Object[]>();
+        List<Object[]> getRow2 = null;
+
         for(GroupEntity row : getRow) {
-            List<Object[]> getRow2 = groupRepository.findDailyRanking(row.getGroupNumber(), date);
-            rankingList.add(new Object[]{row.getGroupNumber(), row.getGroupSubject(), getRow2});
+            switch (rankingType) {
+                case "1":
+                    getRow2 = pedometerRankingRepository.findDailyRanking(row.getGroupNumber(), date);
+                    break;
+                case "2":
+                    getRow2 = pedometerAccumulateRepository.findGodLifeRanking(row.getGroupNumber());
+                    break;
+                case "3":
+                    getRow2 = diyAccumulateRepository.findDiyRanking(row.getGroupNumber());
+                    break;
+            }
+            GroupDto groupDto = row.toDto();
+            rankingList.add(new Object[]{groupDto.getGroupNumber(), groupDto.getGroupSubject(), getRow2});
         }
         return rankingList;
     }
@@ -79,7 +96,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Override
     public List<Object> dailyRankingDetail(int groupNumber, Date date) {
         Optional<GroupEntity> getRow = groupRepository.findById(groupNumber);
-        List<Object[]> getRow2 = groupRepository.findDailyRankingDetail(groupNumber, date);
+        List<Object[]> getRow2 = pedometerRankingRepository.findDailyRankingDetail(groupNumber, date);
 
         GroupDto groupDto = getRow.get().toDto();
         List<Object> ranking = new ArrayList<Object>();
@@ -89,29 +106,25 @@ public class ChallengeServiceImpl implements ChallengeService {
         return ranking;
     }
 
-    // 갓생챌린지 누적랭킹
-    @Override
-    public List<Object[]> accumulateRanking(String loginId) {
-        List<GroupEntity> getRow = groupRepository.findRankingList(loginId);
-
-        if(getRow.isEmpty()) {
-            return null;
-        }
-
-        List<Object[]> rankingList = new ArrayList<Object[]>();
-        for(GroupEntity row : getRow) {
-            List<Object[]> getRow2 = groupRepository.findRanking(row.getGroupNumber());
-            GroupDto groupDto = row.toDto();
-            rankingList.add(new Object[]{groupDto.getGroupNumber(), groupDto.getGroupSubject(), getRow2});
-        }
-        return rankingList;
-    }
-
     // 갓생챌린지 누적랭킹 상세
     @Override
-    public List<Object> accumulateRankingDetail(int groupNumber) {
+    public List<Object> GodLifeRankingDetail(int groupNumber) {
         Optional<GroupEntity> getRow = groupRepository.findById(groupNumber);
-        List<Object[]> getRow2 = groupRepository.findRankingDetail(groupNumber);
+        List<Object[]> getRow2 = pedometerAccumulateRepository.findGodLifeRankingDetail(groupNumber);
+
+        GroupDto groupDto = GroupDto.builder().groupSubject(getRow.get().getGroupSubject()).groupName(getRow.get().getGroupName()).build();
+        List<Object> ranking = new ArrayList<Object>();
+        ranking.add(groupDto);
+        ranking.add(getRow2);
+
+        return ranking;
+    }
+
+    // DIY 챌린지 랭킹 상세
+    @Override
+    public List<Object> diyRankingDetail(int groupNumber) {
+        Optional<GroupEntity> getRow = groupRepository.findById(groupNumber);
+        List<Object[]> getRow2 = diyAccumulateRepository.findDiyRankingDetail(groupNumber);
 
         GroupDto groupDto = GroupDto.builder().groupSubject(getRow.get().getGroupSubject()).groupName(getRow.get().getGroupName()).build();
         List<Object> ranking = new ArrayList<Object>();
@@ -178,7 +191,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     // 갓생 챌린지 생성하기
     @Override
-    public int saveGodlifeChallenge(GroupDto groupDto, String loginId, String[] members) {
+    public int saveGodLifeChallenge(GroupDto groupDto, String loginId, String[] members) {
         GroupEntity groupEntity = groupDto.toEntity();
         int groupNumber = groupRepository.save(groupEntity).getGroupNumber(); // 그룹 insert
 
@@ -313,16 +326,6 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         // 진행중인 그룹의 일일랭킹 row 생성
         System.out.println("진행중인 그룹의 일일랭킹 row 생성");
-        List<GroupPersonEntity> getRow3 = groupPersonRepository.findInsertRanking();
-        for(GroupPersonEntity row : getRow3) {
-            PedometerRankingEntity pedometerRankingEntity = PedometerRankingEntity.builder()
-                    .pedometerDate(today)
-                    .groupNumber(row.getGroupNumber())
-                    .memId(row.getMemId())
-                    .pedometerResult(0)
-                    .pedometerRank(0)
-                    .build();
-            pedometerRankingRepository.save(pedometerRankingEntity);
-        }
+        pedometerRankingRepository.insertRanking(today);
     }
 }

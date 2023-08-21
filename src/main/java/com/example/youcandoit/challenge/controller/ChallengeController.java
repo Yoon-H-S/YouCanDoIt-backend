@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Date;
@@ -34,11 +33,11 @@ public class ChallengeController {
         return myRank;
     }
 
-    // 갓생 챌린지 일일랭킹 목록
-    @GetMapping("daily-ranking")
-    public List<Object[]> DailyRanking(HttpSession session) {
+    // 챌린지 랭킹 목록
+    @GetMapping("challenge-ranking/{rankingType}")
+    public List<Object[]> challengeRanking(HttpSession session, @PathVariable String rankingType) {
         String loginId = (String)session.getAttribute("loginId");
-        return challengeService.dailyRanking(loginId);
+        return challengeService.challengeRanking(loginId, rankingType);
     }
 
     // 갓생 챌린지 일일랭킹 상세
@@ -47,17 +46,10 @@ public class ChallengeController {
         return challengeService.dailyRankingDetail(groupNumber, date);
     }
 
-    // 갓생 챌린지 누적랭킹 목록
-    @GetMapping("godlife-ranking")
-    public List<Object[]> godlifeRanking(HttpSession session) {
-        String loginId = (String)session.getAttribute("loginId");
-        return challengeService.accumulateRanking(loginId);
-    }
-
     // 갓생 챌린지 누적랭킹 상세
     @GetMapping("godlife-ranking-detail")
     public List<Object> godlifeRankingDetail(int groupNumber) {
-        return challengeService.accumulateRankingDetail(groupNumber);
+        return challengeService.GodLifeRankingDetail(groupNumber);
     }
 
     // api/challenge-api/godlife-challenge-list
@@ -75,7 +67,7 @@ public class ChallengeController {
     }
 
     // api/challenge-api/with-friend
-    // 갓생 챌린지 생성하기 > 함께할 친구 선택
+    // 챌린지 생성하기 > 함께할 친구 선택
     @GetMapping("with-friend")
     public List<MemberDto> withFriend(HttpSession session) {
         String loginId = (String) session.getAttribute("loginId");
@@ -93,7 +85,7 @@ public class ChallengeController {
         String defaultGroupImage = "/groupImage/defaultGroup.png";
         groupDto.setGroupImage(defaultGroupImage);
         String loginId = (String)session.getAttribute("loginId");
-        int groupNumber = challengeService.saveGodlifeChallenge(groupDto, loginId, members);
+        int groupNumber = challengeService.saveGodLifeChallenge(groupDto, loginId, members);
         return groupNumber;
     }
 
