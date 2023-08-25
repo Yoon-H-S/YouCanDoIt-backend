@@ -59,12 +59,18 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Integer> { /
     =========================================챌린지페이지=========================================================
      */
 
-    /** 진행중인 챌린지 그룹 조회 */
+    /** 챌린지 그룹 조회(랭킹페이지) */
     @Query("select g from GroupEntity g " +
             "join GroupPersonEntity p on p.groupNumber = g.groupNumber " +
             "where p.memId=:loginId and g.groupClass=:groupClass and g.groupState=2 " +
             "order by g.groupEnddate")
     List<GroupEntity> findInProgressGroupList(@Param("loginId")String loginId, @Param("groupClass")String groupClass);
+
+    @Query("select g from GroupEntity g " +
+            "join GroupPersonEntity p on p.groupNumber = g.groupNumber " +
+            "where p.memId=:loginId and g.groupClass in :groupClass and g.groupState=3 " +
+            "order by g.groupEnddate desc")
+    List<GroupEntity> findEndGroupList(@Param("loginId")String loginId, @Param("groupClass")String[] groupClass);
 
     /** 예약된 챌린지 리스트 */
     @Query(value = "select g from GroupEntity g " +

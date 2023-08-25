@@ -1,8 +1,6 @@
 package com.example.youcandoit.challenge.service;
 
-import com.example.youcandoit.dto.GodlifeChallengeDto;
-import com.example.youcandoit.dto.GroupDto;
-import com.example.youcandoit.dto.MemberDto;
+import com.example.youcandoit.dto.*;
 
 import java.sql.Date;
 import java.util.List;
@@ -16,7 +14,9 @@ public interface ChallengeService {
     int saveGodLifeChallenge(GroupDto groupDto, String loginId, String[] members);
     void saveGroupImage(GroupDto groupDto);
     List<Object[]> challengeRanking(String loginId,String rankingType);
-    List<Object> dailyRankingDetail(int groupNumber, Date date);
-    List<Object> GodLifeRankingDetail(int groupNumber);
-    List<Object> diyRankingDetail(int groupNumber);
+    List<Object> rankingDetail(String rankingType, int groupNumber, Date date);
+    List<Object[]> diyGallery(int groupNumber ,String memId, String loginId);
+    int diyOpposite(OppositeDto oppositeDto);
+
+    void methodsTest1();
 }

@@ -36,7 +36,4 @@ public interface FriendRepository extends JpaRepository<FriendEntity, FriendId> 
             "and (p2.personStatus=1 or p2.personStatus=2) " +
             "order by FIELD(g.groupState, 2, 1, 3), g.groupEnddate")
     List<Object[]> findWithGroup(@Param("memId")String memId, @Param("friendId")String friendId);
-
-    /** 이미 친구인지 조회 */
-    Optional<FriendEntity> findByMemIdAndFriendId(String memId, String friendId);
 }
