@@ -3,6 +3,7 @@ package com.example.youcandoit.friend.service.impl;
 import com.example.youcandoit.dto.FriendDto;
 import com.example.youcandoit.dto.MemberDto;
 import com.example.youcandoit.entity.FriendEntity;
+import com.example.youcandoit.entity.Id.FriendId;
 import com.example.youcandoit.repository.FriendRepository;
 import com.example.youcandoit.friend.service.FriendService;
 import com.example.youcandoit.entity.MemberEntity;
@@ -89,9 +90,10 @@ public class FriendServiceImpl implements FriendService {
         List<Object> response = new ArrayList<Object>();
         if(getMemberRow.isPresent()) { // 회원이 있다면
             // 친구인지 조회
-            Optional<FriendEntity> getFriendRow = friendRepository.findByMemIdAndFriendId(friendDto.getMemId(), friendDto.getFriendId());
+            FriendId friendId = new FriendId(friendDto.getMemId(), friendDto.getFriendId());
+            boolean isFriend = friendRepository.existsById(friendId);
 
-            if(getFriendRow.isPresent()) { // 친구라면
+            if(isFriend) { // 친구라면
                 response.add("2"); // 이미 친구인 상태
             } else { // 친구가 아니라면
                 response.add("1"); // 친구가 아닌 상태

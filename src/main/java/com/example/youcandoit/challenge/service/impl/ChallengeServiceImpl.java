@@ -1,11 +1,11 @@
 package com.example.youcandoit.challenge.service.impl;
 
+import com.example.youcandoit.dto.*;
 import com.example.youcandoit.entity.*;
+import com.example.youcandoit.entity.Id.DiyCertifyId;
+import com.example.youcandoit.entity.Id.OppositeId;
 import com.example.youcandoit.repository.*;
 import com.example.youcandoit.challenge.service.ChallengeService;
-import com.example.youcandoit.dto.GodlifeChallengeDto;
-import com.example.youcandoit.dto.GroupDto;
-import com.example.youcandoit.dto.MemberDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,6 +24,9 @@ public class ChallengeServiceImpl implements ChallengeService {
     FriendRepository friendRepository;
     PedometerRankingRepository pedometerRankingRepository;
     PedometerAccumulateRepository pedometerAccumulateRepository;
+    DiyAccumulateRepository diyAccumulateRepository;
+    DiyCertifyRepository diyCertifyRepository;
+    OppositeRepository oppositeRepository;
 
     @Autowired
     public ChallengeServiceImpl(
@@ -32,21 +35,27 @@ public class ChallengeServiceImpl implements ChallengeService {
             FriendRepository friendRepository,
             GroupPersonRepository groupPersonRepository,
             PedometerRankingRepository pedometerRankingRepository,
-            PedometerAccumulateRepository pedometerAccumulateRepository) {
+            PedometerAccumulateRepository pedometerAccumulateRepository,
+            DiyAccumulateRepository diyAccumulateRepository,
+            DiyCertifyRepository diyCertifyRepository,
+            OppositeRepository oppositeRepository) {
         this.groupPersonRepository = groupPersonRepository;
         this.godLifeChallengeRepository = godLifeChallengeRepository;
         this.groupRepository = groupRepository;
         this.friendRepository = friendRepository;
         this.pedometerRankingRepository = pedometerRankingRepository;
         this.pedometerAccumulateRepository = pedometerAccumulateRepository;
+        this.diyAccumulateRepository = diyAccumulateRepository;
+        this.diyCertifyRepository = diyCertifyRepository;
+        this.oppositeRepository = oppositeRepository;
     }
 
 
-    // 나의 랭킹
+    /** 나의 랭킹 */
     @Override
     public List<Object[]> myRanking(String loginId) {
         Date date = Date.valueOf(LocalDate.now());
-        List<Object[]> getRow = groupPersonRepository.findGroup(loginId, date);
+        List<Object[]> getRow = pedometerRankingRepository.findMyRankingList(loginId, date);
         List<Object[]> myRankData = new ArrayList<Object[]>();
         for(Object[] row : getRow) {
             GroupDto groupDto = ((GroupEntity)row[0]).toDto();
@@ -57,29 +66,81 @@ public class ChallengeServiceImpl implements ChallengeService {
         return myRankData;
     }
 
-    // 갓생챌린지 일일랭킹
+    /** 챌린지 랭킹 리스트 조회 */
     @Override
-    public List<Object[]> dailyRanking(String loginId) {
-        Date date = Date.valueOf(LocalDate.now());
-        List<GroupEntity> getRow = groupRepository.findRankingList(loginId);
+    public List<Object[]> challengeRanking(String loginId, String rankingType) {
+        System.out.println(rankingType);
+        List<GroupEntity> getRow;
+        switch (rankingType) {
+            case "1": case "2":
+                getRow = groupRepository.findInProgressGroupList(loginId, "1");
+                break;
+            case "3":
+                getRow = groupRepository.findInProgressGroupList(loginId, "2");
+                break;
+            case "4": default:
+                getRow = groupRepository.findEndGroupList(loginId, new String[]{"1", "2"});
+                break;
+        }
 
         if(getRow.isEmpty()) {
             return null;
         }
 
+        Date date = Date.valueOf(LocalDate.now());
         List<Object[]> rankingList = new ArrayList<Object[]>();
+        List<Object[]> getRow2 = null;
+
         for(GroupEntity row : getRow) {
-            List<Object[]> getRow2 = groupRepository.findDailyRanking(row.getGroupNumber(), date);
-            rankingList.add(new Object[]{row.getGroupNumber(), row.getGroupSubject(), getRow2});
+            switch (rankingType) {
+                case "1":
+                    getRow2 = pedometerRankingRepository.findDailyRanking(row.getGroupNumber(), date);
+                    break;
+                case "2":
+                    getRow2 = pedometerAccumulateRepository.findGodLifeRanking(row.getGroupNumber());
+                    break;
+                case "3":
+                    getRow2 = diyAccumulateRepository.findDiyRanking(row.getGroupNumber());
+                    break;
+                case "4": default:
+                    if(row.getGroupClass().equals("1"))
+                        getRow2 = pedometerAccumulateRepository.findGodLifeRanking(row.getGroupNumber());
+                    else
+                        getRow2 = diyAccumulateRepository.findDiyRanking(row.getGroupNumber());
+                    break;
+            }
+            GroupDto groupDto = row.toDto();
+            rankingList.add(new Object[]{groupDto.getGroupNumber(), groupDto.getGroupSubject(), getRow2});
         }
         return rankingList;
     }
 
-    // 갓생챌린지 일일랭킹 상세
+    /** 랭킹 상세 조회 */
     @Override
+    public List<Object> rankingDetail(String rankingType, int groupNumber, Date date) {
+        switch (rankingType) {
+            case "1":
+                return dailyRankingDetail(groupNumber, date);
+            case "2":
+                return GodLifeRankingDetail(groupNumber);
+            case "3":
+                return diyRankingDetail(groupNumber);
+            case "4": default:
+                Optional<GroupEntity> groupEntity = groupRepository.findById(groupNumber);
+                if(groupEntity.isPresent()) {
+                    if(groupEntity.get().getGroupClass().equals("1"))
+                        return GodLifeRankingDetail(groupNumber);
+                    else
+                        return diyRankingDetail(groupNumber);
+                }
+                return null;
+        }
+    }
+
+    /** 갓생챌린지 일일랭킹 상세 */
     public List<Object> dailyRankingDetail(int groupNumber, Date date) {
         Optional<GroupEntity> getRow = groupRepository.findById(groupNumber);
-        List<Object[]> getRow2 = groupRepository.findDailyRankingDetail(groupNumber, date);
+        List<Object[]> getRow2 = pedometerRankingRepository.findDailyRankingDetail(groupNumber, date);
 
         GroupDto groupDto = getRow.get().toDto();
         List<Object> ranking = new ArrayList<Object>();
@@ -89,31 +150,12 @@ public class ChallengeServiceImpl implements ChallengeService {
         return ranking;
     }
 
-    // 갓생챌린지 누적랭킹
-    @Override
-    public List<Object[]> accumulateRanking(String loginId) {
-        List<GroupEntity> getRow = groupRepository.findRankingList(loginId);
-
-        if(getRow.isEmpty()) {
-            return null;
-        }
-
-        List<Object[]> rankingList = new ArrayList<Object[]>();
-        for(GroupEntity row : getRow) {
-            List<Object[]> getRow2 = groupRepository.findRanking(row.getGroupNumber());
-            GroupDto groupDto = row.toDto();
-            rankingList.add(new Object[]{groupDto.getGroupNumber(), groupDto.getGroupSubject(), getRow2});
-        }
-        return rankingList;
-    }
-
-    // 갓생챌린지 누적랭킹 상세
-    @Override
-    public List<Object> accumulateRankingDetail(int groupNumber) {
+    /** 갓생챌린지 누적랭킹 상세 */
+    public List<Object> GodLifeRankingDetail(int groupNumber) {
         Optional<GroupEntity> getRow = groupRepository.findById(groupNumber);
-        List<Object[]> getRow2 = groupRepository.findRankingDetail(groupNumber);
+        List<Object[]> getRow2 = pedometerAccumulateRepository.findGodLifeRankingDetail(groupNumber);
 
-        GroupDto groupDto = GroupDto.builder().groupSubject(getRow.get().getGroupSubject()).groupName(getRow.get().getGroupName()).build();
+        GroupDto groupDto = getRow.get().toDto();
         List<Object> ranking = new ArrayList<Object>();
         ranking.add(groupDto);
         ranking.add(getRow2);
@@ -121,7 +163,60 @@ public class ChallengeServiceImpl implements ChallengeService {
         return ranking;
     }
 
-    // 예약된 챌린지
+    /** DIY 챌린지 랭킹 상세 */
+    public List<Object> diyRankingDetail(int groupNumber) {
+        Optional<GroupEntity> getRow = groupRepository.findById(groupNumber);
+        List<Object[]> getRow2 = diyAccumulateRepository.findDiyRankingDetail(groupNumber);
+
+        GroupDto groupDto = getRow.get().toDto();
+        List<Object> ranking = new ArrayList<Object>();
+        ranking.add(groupDto);
+        ranking.add(getRow2);
+
+        return ranking;
+    }
+
+    /** diy 갤러리 리스트 조회 */
+    @Override
+    public List<Object[]> diyGallery(int groupNumber, String memId, String loginId) {
+        Date today = Date.valueOf(LocalDate.now());
+        List<DiyCertifyEntity> getRow = null;
+        if(memId == null) {
+            getRow = diyCertifyRepository.findByGroupNumberAndCertifyDateBeforeOrderByCertifyDateDesc(groupNumber, today);
+        } else {
+            getRow = diyCertifyRepository.findByGroupNumberAndMemIdAndCertifyDateBeforeOrderByCertifyDateDesc(groupNumber, memId, today);
+        }
+        List<Object[]> objectList = new ArrayList<Object[]>();
+        for(DiyCertifyEntity row : getRow) {
+            OppositeId oppositeId = new OppositeId(row.getCertifyDate(), row.getGroupNumber(), row.getMemId(), loginId);
+            objectList.add(new Object[]{row.toDto(), oppositeRepository.existsById(oppositeId)});
+        }
+        return objectList;
+    }
+
+    /** diy 인증 반대 */
+    @Override
+    public int diyOpposite(OppositeDto oppositeDto) {
+        Date today = Date.valueOf(LocalDate.now());
+        Date certifyDay = oppositeDto.getCertifyDate();
+        int diffDate = (int)(today.getTime() - certifyDay.getTime()) / (1000*60*60*24);
+        if(diffDate > 7) {
+            return diffDate;
+        }
+
+        OppositeEntity oppositeEntity = oppositeDto.toEntity();
+        try {
+            oppositeRepository.save(oppositeEntity);
+            diyCertifyRepository.updateOppositeCount(oppositeEntity.getCertifyDate(), oppositeEntity.getGroupNumber(), oppositeEntity.getMemId());
+            return diffDate;
+        } catch (Exception e) {
+            System.out.println(e);
+            return 0;
+        }
+
+    }
+
+    /** 예약된 챌린지 */
     @Override
     public List<GroupDto> challengeReservation(String loginId) {
         List<GroupEntity> getRow = groupRepository.findChallengeReservation(loginId);
@@ -139,7 +234,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         return groups;
     }
 
-    // 갓생 챌린지
+    /** 갓생 챌린지 */
     @Override
     public List<GodlifeChallengeDto> godLifeChallenge() {
         List<GodlifeChallengeEntity> getRow = godLifeChallengeRepository.findAll();
@@ -152,7 +247,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         return godlifeList;
     }
 
-    // 갓생 챌린지 상세보기
+    /** 갓생 챌린지 상세보기 */
     @Override
     public GodlifeChallengeDto godLifeChallengeDetail(String challengeSubject) {
         Optional<GodlifeChallengeEntity> getRow = godLifeChallengeRepository.findById(challengeSubject);
@@ -160,7 +255,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         return getRow.get().toDto();
     }
 
-    // 갓생 챌린지 생성하기 > 함께할 친구 선택
+    /** 챌린지 생성하기 > 함께할 친구 선택 */
     @Override
     public List<MemberDto> withFriend(String loginId) {
         List<MemberEntity> getRow = friendRepository.findFriendList(loginId);
@@ -176,9 +271,9 @@ public class ChallengeServiceImpl implements ChallengeService {
         }
     }
 
-    // 갓생 챌린지 생성하기
+    /** 챌린지 생성하기 */
     @Override
-    public int saveGodlifeChallenge(GroupDto groupDto, String loginId, String[] members) {
+    public int saveGodLifeChallenge(GroupDto groupDto, String loginId, String[] members) {
         GroupEntity groupEntity = groupDto.toEntity();
         int groupNumber = groupRepository.save(groupEntity).getGroupNumber(); // 그룹 insert
 
@@ -195,7 +290,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         return groupNumber;
     }
 
-    // 챌린지 이미지 저장
+    /** 챌린지 이미지 저장 */
     @Override
     public void saveGroupImage(GroupDto groupDto) {
         Optional<GroupEntity> getRow = groupRepository.findById(groupDto.getGroupNumber());
@@ -209,6 +304,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     =======================================1시간마다 랭킹 업데이트===========================================
      */
 
+    /** 1시간마다 랭킹 업데이트 */
     @Scheduled(cron = "0 1 1-23/1 * * *")
 //    @Scheduled(cron = "0/10 * * * * *")
     public void rankingUpdate() {
@@ -243,13 +339,14 @@ public class ChallengeServiceImpl implements ChallengeService {
     =======================================자정마다 데이터베이스 업데이트===========================================
      */
 
+    /** 자정마다 데이터베이스 업데이트 */
     @Scheduled(cron = "0 1 0 * * *")
 //    @Scheduled(cron = "0/10 * * * * *")
     public void databaseUpdate() {
         Date today = Date.valueOf(LocalDate.now());
         Date yesterday = Date.valueOf(LocalDate.now().minusDays(1));
 
-        // 일일랭킹 순위 업데이트
+        // 갓생 일일랭킹 순위 업데이트
         System.out.println("일일랭킹 순위 업데이트");
         int previousGroupNum = 0; // 전 row의 그룹번호를 저장
         int previousPedoRes = 0; // 전 row의 만보기결과를 저장
@@ -261,13 +358,11 @@ public class ChallengeServiceImpl implements ChallengeService {
                 previousPedoRes = 0; // 만보기결과 초기화
             }
 
-            if(previousPedoRes == row.getPedometerResult()) { // 전 row와 만보기 결과가 같다면
+            if(previousPedoRes == row.getPedometerResult()) // 전 row와 만보기 결과가 같다면
                 row.setPedometerRank(ranking); // 같은 순위
-                pedometerRankingRepository.save(row);
-            } else { // 전 row와 만보기 결과가 다르다면
+            else // 전 row와 만보기 결과가 다르다면
                 row.setPedometerRank(++ranking); // 다음 순위
-                pedometerRankingRepository.save(row);
-            }
+            pedometerRankingRepository.save(row);
 
             previousGroupNum = row.getGroupNumber();
             previousPedoRes = row.getPedometerResult();
@@ -277,52 +372,90 @@ public class ChallengeServiceImpl implements ChallengeService {
             pedometerAccumulateRepository.updateAccumulate(row.getPedometerResult(), row.getGroupNumber(), row.getMemId());
         }
 
-        // 누적랭킹 순위 업데이트
+        // 갓생 누적랭킹 순위 업데이트
         System.out.println("누적랭킹 순위 업데이트");
         previousGroupNum = 0;
         previousPedoRes = 0;
         ranking = 0;
-        List<PedometerAccumulateEntity> getRow2 = pedometerAccumulateRepository.findAccumulate();
+        List<PedometerAccumulateEntity> getRow2 = pedometerAccumulateRepository.findPedometerAccumulate();
         for(PedometerAccumulateEntity row : getRow2) {
             if(previousGroupNum != row.getGroupNumber()) { // 전 row와 그룹번호가 다르다면
                 ranking = 0; // 랭킹 넘버링 초기화
                 previousPedoRes = 0; // 만보기결과 초기화
             }
 
-            if(previousPedoRes == row.getPedometerCount()) { // 전 row와 만보기 결과가 같다면
+            if(previousPedoRes == row.getPedometerCount()) // 전 row와 만보기 결과가 같다면
                 row.setPedoaccuRank(ranking); // 같은 순위
-                pedometerAccumulateRepository.save(row);
-            } else { // 전 row와 만보기 결과가 다르다면
+            else // 전 row와 만보기 결과가 다르다면
                 row.setPedoaccuRank(++ranking); // 다음 순위
-                pedometerAccumulateRepository.save(row);
-            }
+            pedometerAccumulateRepository.save(row);
 
             previousGroupNum = row.getGroupNumber();
             previousPedoRes = row.getPedometerCount();
+        }
+
+        // DIY 반대가 과반수를 넘은 인증 삭제
+        System.out.println("DIY 반대가 과반수를 넘은 인증 삭제");
+        List<DiyCertifyEntity> diyOppositeList = diyCertifyRepository.findMajorityOpposite();
+        if(!diyOppositeList.isEmpty()) {
+            for(DiyCertifyEntity row : diyOppositeList) {
+                diyCertifyRepository.deleteById(new DiyCertifyId(row.getCertifyDate(), row.getGroupNumber(), row.getMemId()));
+                diyAccumulateRepository.decreaseCertifyCount(row.getGroupNumber(), row.getMemId());
+            }
+        }
+
+        // Diy 인증 랭킹에 반영
+        System.out.println("diy 인증 랭킹 반영");
+        List<DiyCertifyEntity> diyCertifyEntityList = diyCertifyRepository.findByCertifyDate(yesterday);
+        for(DiyCertifyEntity row : diyCertifyEntityList) {
+            diyAccumulateRepository.increaseCertifyCount(row.getGroupNumber(), row.getMemId());
+        }
+
+        // diy 랭킹 업데이트
+        System.out.println("diy 랭킹 순위 업데이트");
+        previousGroupNum = 0;
+        previousPedoRes = 0;
+        ranking = 0;
+        List<DiyAccumulateEntity> getRow3 = diyAccumulateRepository.findDiyAccumulate();
+        for(DiyAccumulateEntity row : getRow3) {
+            if(previousGroupNum != row.getGroupNumber()) { // 전 row와 그룹번호가 다르다면
+                ranking = 0; // 랭킹 넘버링 초기화
+                previousPedoRes = 0; // 만보기결과 초기화
+            }
+
+            if(previousPedoRes == row.getCertifyCount()) // 전 row와 만보기 결과가 같다면
+                row.setDiyaccuRank(ranking); // 같은 순위
+            else // 전 row와 만보기 결과가 다르다면
+                row.setDiyaccuRank(++ranking); // 다음 순위
+            diyAccumulateRepository.save(row);
+
+            previousGroupNum = row.getGroupNumber();
+            previousPedoRes = row.getCertifyCount();
         }
 
         // 기간이 지난 그룹 종료하기
         System.out.println("기간 지난 그룹 종료하기");
         groupRepository.updateGroupEnd(yesterday);
 
-        // 기간이 된 그룹 시작하기(대기자 삭제), 시작한 그룹의 누적랭킹 row 생성
+
         System.out.println("기간이 된 그룹 시작(대기자 삭제), 시작한 그룹의 누적랭킹 row 생성");
+        // 기간이 된 그룹 시작하기(대기자 삭제)
         groupPersonRepository.deleteGroupPerson(today);
         groupRepository.updateGroupStart(today);
-        pedometerAccumulateRepository.insertAccumulate(today);
+
+        // 시작한 갓생 그룹의 누적랭킹 row 생성
+        pedometerAccumulateRepository.insertPedometerAccumulate(today);
+
+        // 시작한 diy 그룹의 랭킹 row 생성
+        diyAccumulateRepository.insertDiyAccumulate(today);
 
         // 진행중인 그룹의 일일랭킹 row 생성
         System.out.println("진행중인 그룹의 일일랭킹 row 생성");
-        List<GroupPersonEntity> getRow3 = groupPersonRepository.findInsertRanking();
-        for(GroupPersonEntity row : getRow3) {
-            PedometerRankingEntity pedometerRankingEntity = PedometerRankingEntity.builder()
-                    .pedometerDate(today)
-                    .groupNumber(row.getGroupNumber())
-                    .memId(row.getMemId())
-                    .pedometerResult(0)
-                    .pedometerRank(0)
-                    .build();
-            pedometerRankingRepository.save(pedometerRankingEntity);
-        }
+        pedometerRankingRepository.insertRanking(today);
+    }
+
+    /** 테스트 메소드 */
+    @Override
+    public void methodsTest1() {
     }
 }

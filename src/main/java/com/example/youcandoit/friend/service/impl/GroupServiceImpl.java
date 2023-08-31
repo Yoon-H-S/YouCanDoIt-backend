@@ -93,7 +93,7 @@ public class GroupServiceImpl implements GroupService {
     // 메인페이지 그룹 초대
     @Override
     public List<GroupDto> mainInvite(String loginId) {
-        List<GroupEntity> getRow = groupRepository.findGroupInvite(loginId);
+        List<GroupEntity> getRow = groupPersonRepository.findGroupInvite(loginId);
 
         List<GroupDto> groups = new ArrayList<GroupDto>();
         for(GroupEntity row : getRow) {
@@ -110,7 +110,7 @@ public class GroupServiceImpl implements GroupService {
     // 그룹에 초대된 멤버들
     @Override
     public List<Object[]> inviteMember(int groupNumber) {
-        List<Object[]> getRow = groupRepository.findInviteMember(groupNumber);
+        List<Object[]> getRow = groupPersonRepository.findInviteMember(groupNumber);
         return getRow;
     }
 
