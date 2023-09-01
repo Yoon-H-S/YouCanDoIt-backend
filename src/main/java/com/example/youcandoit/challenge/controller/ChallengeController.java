@@ -24,7 +24,7 @@ public class ChallengeController {
 
 
     /** 메인페이지 나의랭킹 */
-    @GetMapping("my-ranking")
+    @GetMapping("/my-ranking")
     public List<Object[]> myRanking(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
         List<Object[]> myRank = challengeService.myRanking(loginId);
@@ -32,20 +32,20 @@ public class ChallengeController {
     }
 
     /** 챌린지 랭킹 목록 */
-    @GetMapping("challenge-ranking/{rankingType}")
+    @GetMapping("/challenge-ranking/{rankingType}")
     public List<Object[]> challengeRanking(HttpSession session, @PathVariable String rankingType) {
         String loginId = (String)session.getAttribute("loginId");
         return challengeService.challengeRanking(loginId, rankingType);
     }
 
     /** 랭킹 상세 */
-    @GetMapping("ranking-detail/{rankingType}")
+    @GetMapping("/ranking-detail/{rankingType}")
     public List<Object> rankingDetail(@PathVariable String rankingType, @RequestParam int groupNumber, @RequestParam(required = false) Date date) {
         return challengeService.rankingDetail(rankingType ,groupNumber, date);
     }
 
     /** diy 챌린지 갤러리 */
-    @GetMapping("diy-gallery")
+    @GetMapping("/diy-gallery")
     public List<Object[]> diyGallery(@RequestParam int groupNumber, @RequestParam(required = false) String memId, HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
         return challengeService.diyGallery(groupNumber, memId, loginId);
@@ -59,23 +59,20 @@ public class ChallengeController {
         return challengeService.diyOpposite(oppositeDto);
     }
 
-    // api/challenge-api/godlife-challenge-list
     /** 갓생 챌린지 목록 */
     @GetMapping("/godlife-challenge-list")
     public List<GodlifeChallengeDto> godLifeChallenge() {
         return challengeService.godLifeChallenge();
     }
 
-    // api/challenge-api/godlife-challenge-detail
     /** 갓생 챌린지 상세보기 */
     @GetMapping("/godlife-challenge-detail")
     public GodlifeChallengeDto godLifeChallengeDetail(@RequestParam String subject) {
         return challengeService.godLifeChallengeDetail(subject);
     }
 
-    // api/challenge-api/with-friend
     /** 챌린지 생성하기 > 함께할 친구 선택 */
-    @GetMapping("with-friend")
+    @GetMapping("/with-friend")
     public List<MemberDto> withFriend(HttpSession session) {
         String loginId = (String) session.getAttribute("loginId");
         List<MemberDto> memberDto = challengeService.withFriend(loginId);
@@ -85,7 +82,6 @@ public class ChallengeController {
         return memberDto;
     }
 
-    // api/challenge-api/challenge-create
     /** 챌린지 생성하기 */
     @PostMapping("/challenge-create")
     public int challengeCreate(@RequestBody GroupDto groupDto, @RequestParam String[] members, HttpSession session) {
@@ -116,9 +112,8 @@ public class ChallengeController {
         challengeService.saveGroupImage(groupDto);
     }
 
-    // api/challenge-api/challenge-reservation
     /** 예약된 챌린지 */
-    @PostMapping("challenge-reservation")
+    @PostMapping("/challenge-reservation")
     public List<GroupDto> challengeReservation(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
         List<GroupDto> groupDto = challengeService.challengeReservation(loginId);
@@ -127,10 +122,4 @@ public class ChallengeController {
             return null;
         return groupDto;
     }
-
-    @GetMapping("test1")
-    public void methodTest1() {
-        challengeService.methodsTest1();
-    }
-
 }

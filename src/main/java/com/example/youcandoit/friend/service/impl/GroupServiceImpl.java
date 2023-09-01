@@ -27,7 +27,7 @@ public class GroupServiceImpl implements GroupService {
         this.groupPersonRepository = groupPersonRepository;
     }
 
-    // 그룹 목록
+    /** 그룹 목록 */
     @Override
     public List<GroupDto> groupList(String loginId) {
         List<GroupEntity> getRow = groupRepository.findGroupList(loginId);
@@ -43,7 +43,7 @@ public class GroupServiceImpl implements GroupService {
         }
     }
 
-    // 그룹 목록 검색
+    /** 그룹 목록 검색 */
     @Override
     public List<GroupDto> findGroups(String loginId, String groupName) {
         List<GroupEntity> getRow = groupRepository.findSearchGroups(loginId, groupName);
@@ -59,7 +59,7 @@ public class GroupServiceImpl implements GroupService {
         }
     }
 
-    // 그룹 프로필사진
+    /** 그룹 프로필사진 */
     @Override
     public List<String[]> groupProfilePicture(int[] groupNumber) {
         List<String[]> profilePicture = new ArrayList<String[]>();
@@ -71,7 +71,7 @@ public class GroupServiceImpl implements GroupService {
         return profilePicture;
     }
 
-    // 그룹 멤버
+    /** 그룹 멤버 */
     @Override
     public List<MemberDto> groupMember(int groupNumber) {
         List<MemberEntity> getRow = groupRepository.findGroupMember(groupNumber);
@@ -83,14 +83,14 @@ public class GroupServiceImpl implements GroupService {
         return members;
     }
 
-    // 그룹 상세 프로필
+    /** 그룹 상세 프로필 */
     @Override
     public GroupDto groupProfile(int groupNumber) {
         Optional<GroupEntity> getRow = groupRepository.findById(groupNumber);
         return getRow.get().toDto();
     }
 
-    // 메인페이지 그룹 초대
+    /** 메인페이지 그룹 초대 */
     @Override
     public List<GroupDto> mainInvite(String loginId) {
         List<GroupEntity> getRow = groupPersonRepository.findGroupInvite(loginId);
@@ -107,14 +107,14 @@ public class GroupServiceImpl implements GroupService {
         return groups;
     }
 
-    // 그룹에 초대된 멤버들
+    /** 그룹에 초대된 멤버들 */
     @Override
     public List<Object[]> inviteMember(int groupNumber) {
         List<Object[]> getRow = groupPersonRepository.findInviteMember(groupNumber);
         return getRow;
     }
 
-    // 그룹초대 수락, 거절
+    /** 그룹초대 수락, 거절 */
     @Override
     public void inviteResponse(GroupPersonDto groupPersonDto, boolean response) {
         GroupPersonEntity groupPersonEntity = groupPersonDto.toEntity();

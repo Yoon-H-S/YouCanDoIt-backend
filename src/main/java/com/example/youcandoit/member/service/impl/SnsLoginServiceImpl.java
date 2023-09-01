@@ -19,7 +19,7 @@ public class SnsLoginServiceImpl implements SnsLoginService {
         this.env = env;
     }
 
-    // 구글 토큰 발급
+    /** 토큰 발급 */
     public String getAccessToken(String code, String registrationId) {
         String accessToken = "";
         String tokenUri = env.getProperty("oauth2." + registrationId + ".token-uri"); // 토큰 요청을 보낼 주소
@@ -49,7 +49,7 @@ public class SnsLoginServiceImpl implements SnsLoginService {
         return accessToken;
     }
 
-    // 유저 정보 받기
+    /** 유저 정보 받기 */
     @Override
     public HashMap<String, Object> getResource(String accessToken, String registrationId) {
         HashMap<String, Object> userInfo = new HashMap<String, Object>();

@@ -26,13 +26,13 @@ public class FriendServiceImpl implements FriendService {
         this.memberRepository = memberRepository;
     }
 
-    // 친구목록의 내 프로필
+    /** 친구목록의 내 프로필 */
     public MemberDto myProfile(String loginId) {
         Optional<MemberEntity> getRow = memberRepository.findById(loginId);
         return MemberDto.builder().profilePicture(getRow.get().getProfilePicture()).nickname(getRow.get().getNickname()).build();
     }
 
-    // 친구 목록
+    /** 친구 목록 */
     @Override
     public List<MemberDto> friendList(String loginId) {
         List<MemberEntity> getRow = friendRepository.findFriendList(loginId);
@@ -48,7 +48,7 @@ public class FriendServiceImpl implements FriendService {
         }
     }
 
-    // 친구 목록 검색
+    /** 친구 목록 검색 */
     @Override
     public List<MemberDto> findFriends(String loginId, String friendName) {
         // 회원이 입력한 친구아이디를 DB에서 조회
@@ -65,7 +65,7 @@ public class FriendServiceImpl implements FriendService {
         }
     }
 
-    // 친구 상세 프로필(같이 있는 그룹)
+    /** 친구 상세 프로필(같이 있는 그룹) */
     @Override
     public List<Object> friendProfile(FriendDto friendDto) {
         Optional<MemberEntity> getRow1 = memberRepository.findById(friendDto.getFriendId());
@@ -81,7 +81,7 @@ public class FriendServiceImpl implements FriendService {
         return friendProfile;
     }
 
-    // 친구추가 페이지의 검색
+    /** 친구추가 페이지의 검색 */
     @Override
     public List<Object> searchId(FriendDto friendDto) {
         // 회원테이블에 회원이 있는지 조회
@@ -110,7 +110,7 @@ public class FriendServiceImpl implements FriendService {
         }
     }
 
-    // 친구 추가
+    /** 친구 추가 */
     @Override
     public void addFriend(FriendDto friendDto) {
         // Dto -> Entity로 변환

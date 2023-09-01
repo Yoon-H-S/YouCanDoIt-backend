@@ -453,9 +453,4 @@ public class ChallengeServiceImpl implements ChallengeService {
         System.out.println("진행중인 그룹의 일일랭킹 row 생성");
         pedometerRankingRepository.insertRanking(today);
     }
-
-    /** 테스트 메소드 */
-    @Override
-    public void methodsTest1() {
-    }
 }

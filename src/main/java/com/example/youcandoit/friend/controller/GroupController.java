@@ -22,7 +22,7 @@ public class GroupController {
         this.groupService = groupService;
     }
 
-    // 그룹 목록
+    /** 그룹 목록 */
     @GetMapping("group-list")
     public List<GroupDto> groupList(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
@@ -33,7 +33,7 @@ public class GroupController {
         return groupDto;
     }
 
-    // 그룹 목록 검색
+    /** 그룹 목록 검색 */
     @GetMapping("group-list/{groupName}")
     public List<GroupDto> findGroup(@PathVariable String groupName, HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
@@ -44,14 +44,14 @@ public class GroupController {
         return groupDto;
     }
 
-    // 그룹 프로필사진
+    /** 그룹 프로필사진 */
     @GetMapping("group-profile-picture")
     public List<String[]> groupProfilePicture(@RequestParam int[] groupNumber) {
         List<String[]> profilePicture = groupService.groupProfilePicture(groupNumber);
         return profilePicture;
     }
 
-    // 그룹 상세 프로필
+    /** 그룹 상세 프로필 */
     @GetMapping("group-profile")
     public List<Object> groupProfile(@RequestParam int groupNumber) {
         GroupDto groupDto = groupService.groupProfile(groupNumber);
@@ -66,7 +66,7 @@ public class GroupController {
         return profile;
     }
 
-    // 메인페이지 그룹 초대
+    /** 메인페이지 그룹 초대 */
     @GetMapping("main-invite")
     public List<GroupDto> mainInvite(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
@@ -77,7 +77,7 @@ public class GroupController {
         return groupDto;
     }
 
-    // 그룹 초대 상세페이지
+    /** 그룹 초대 상세페이지 */
     @GetMapping("group-invite")
     public List<Object> groupInvite(@RequestParam int groupNumber) {
         GroupDto groupDto = groupService.groupProfile(groupNumber);
@@ -89,7 +89,7 @@ public class GroupController {
         return profile;
     }
 
-    // 그룹초대 수락, 거절
+    /** 그룹초대 수락, 거절 */
     @GetMapping("invite-response")
     public void inviteResponse(@RequestParam int groupNumber, @RequestParam boolean response, HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
