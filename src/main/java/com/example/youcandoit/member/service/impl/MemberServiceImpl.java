@@ -18,6 +18,7 @@ public class MemberServiceImpl implements MemberService {
         this.memberRepository = memberRepository;
     }
 
+    /** 로그인 */
     @Override
     public MemberDto loginMember(MemberDto memberDto){
         // 회원이 입력한 아이디와 비밀번호로 DB에서 조회
@@ -30,7 +31,7 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
-    // 아이디로 컬럼 조회(중복 아이디 조회, 세션값으로 닉네임 받기)
+    /** 중복아이디 확인(회원가입) */
     @Override
     public MemberDto getId(String memId) {
         // db에서 값받아서 Entity에 저장
@@ -42,7 +43,7 @@ public class MemberServiceImpl implements MemberService {
             return getRow.get().toDto(); // Entity -> Dto로 변환
     }
 
-    // 회원가입
+    /** 회원가입 */
     @Override
     public void saveMember(MemberDto memberDto) {
         // Dto -> Entity로 변환
@@ -51,7 +52,7 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(memberEntity);
     }
 
-    // 프로필사진경로 저장
+    /** 프로필사진경로 저장 */
     @Override
     public void saveProfile(MemberDto memberDto) {
         Optional<MemberEntity> getRow = memberRepository.findById(memberDto.getMemId());
@@ -61,7 +62,7 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(memberEntity);
     }
 
-    // 전화번호로 아이디 찾기
+    /** 전화번호로 아이디 찾기 */
     @Override
     public MemberDto findId(MemberDto memberDto) {
         Optional<MemberEntity> getRow = memberRepository.findByPhoneNumber(memberDto.getPhoneNumber());
@@ -73,7 +74,7 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
-    // 아이디와 전화번호가 일치하는 회원이 있는지 확인
+    /** 비밀번호 찾기(아이디 & 전화번호) */
     @Override
     public MemberDto findPw(MemberDto memberDto) {
         Optional<MemberEntity> getRow = memberRepository.findByPhoneNumberAndMemId(memberDto.getPhoneNumber(), memberDto.getMemId());
@@ -85,7 +86,7 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
-    // 비밀번호 재설정
+    /** 비밀번호 재설정 */
     @Override
     public void resetPw(MemberDto memberDto) {
         Optional<MemberEntity> getRow = memberRepository.findById(memberDto.getMemId());

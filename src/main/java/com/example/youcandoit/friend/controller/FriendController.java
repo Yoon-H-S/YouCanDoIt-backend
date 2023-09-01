@@ -21,7 +21,7 @@ public class FriendController {
         this.friendService = friendService;
     }
 
-    // 내 프로필
+    /** 내 프로필 */
     @GetMapping("my-profile")
     public MemberDto myProfile(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
@@ -29,8 +29,7 @@ public class FriendController {
         return memberDto;
     }
 
-    // api/friend-api/friend-list
-    // 친구 목록
+     /** 친구 목록 */
     @GetMapping("friend-list")
     public List<MemberDto> friendList(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
@@ -41,8 +40,7 @@ public class FriendController {
         return memberDto;
     }
 
-    // api/friend-api/friend-list/
-    // 친구 목록 검색
+    /** 친구 목록 검색 */
     @GetMapping("friend-list/{friendName}")
     public List<MemberDto> findFriend(@PathVariable String friendName, HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
@@ -53,7 +51,7 @@ public class FriendController {
         return memberDto;
     }
 
-    // 친구 상세 프로필(같이 속한 그룹)
+    /** 친구 상세 프로필(같이 속한 그룹) */
     @PostMapping("friend-profile")
     public List<Object> friendProfile(@RequestBody FriendDto friendDto, HttpSession session) {
         friendDto.setMemId((String)session.getAttribute("loginId"));
@@ -62,14 +60,13 @@ public class FriendController {
         return friendProfile;
     }
 
-    //  친구 추가 페이지의 내 아이디
+    /**  친구 추가 페이지의 내 아이디 */
     @GetMapping("my-id")
     public String myId(HttpSession session) {
         return (String)session.getAttribute("loginId");
     }
 
-    // api/friend-api/search-id
-    // 친구 추가 페이지 검색
+    /** 친구 추가 페이지 검색 */
     @PostMapping("/search-id")
     public List<Object> searchId(@RequestBody FriendDto friendDto, HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
@@ -92,8 +89,7 @@ public class FriendController {
         }
     }
 
-    // api/friend-api/add-friend
-    // 친구 추가
+    /** 친구 추가 */
     @PostMapping("add-friend")
     public void addFriend(@RequestBody FriendDto friendDto, HttpSession session) {
         friendDto.setMemId((String)session.getAttribute("loginId"));

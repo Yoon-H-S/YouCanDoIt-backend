@@ -28,8 +28,7 @@ public class MemberController {
         this.snsLoginService = snsLoginService;
     }
 
-    // api/member-api/login
-    // 로그인
+    /** 로그인 */
     @PostMapping("/login")
     public MemberDto loginMember(@RequestBody MemberDto mDto, HttpSession session) {
         MemberDto memberDto = memberService.loginMember(mDto);
@@ -40,8 +39,7 @@ public class MemberController {
         return memberDto;
     }
 
-    // api/member-api/duplicate-id/{id}
-    // 아이디 중복 확인
+    /** 아이디 중복 확인 */
     @GetMapping("/duplicate-id/{memId}")
     public boolean duplicate(@PathVariable String memId) {
         MemberDto memberDto = memberService.getId(memId);
@@ -51,8 +49,7 @@ public class MemberController {
         return true;
     }
 
-    // api/member-api/signup
-    // 회원가입
+    /** 회원가입 */
     @PostMapping("/signup")
     public void createMember(@RequestBody MemberDto memberDto) {
         String defaultProfilePicture = "/profilePicture/profile" + ((int)(Math.random() * 16) + 1) + ".png";
@@ -61,8 +58,7 @@ public class MemberController {
         memberService.saveMember(memberDto);
     }
 
-    // api/member-api/insert-profile
-    // 프로필사진 업로드
+    /** 프로필사진 업로드 */
     @PostMapping("/insert-profile")
     public void insertProfile(@RequestParam String memId, @RequestPart MultipartFile file) {
         String fileName = file.getOriginalFilename();
@@ -82,8 +78,7 @@ public class MemberController {
         memberService.saveProfile(memberDto);
     }
 
-    // api/member-api/find-id
-    // 전화번호로 아이디 찾기
+    /** 전화번호로 아이디 찾기 */
     @PostMapping("/find-id")
     public MemberDto findId(@RequestBody MemberDto mDto) {
         MemberDto memberDto = memberService.findId(mDto);
@@ -93,8 +88,7 @@ public class MemberController {
         return memberDto;
     }
 
-    // api/member-api/find-pw
-    // 아이디와 전화번호가 일치하는 회원이 있는지 확인
+    /** 아이디와 전화번호가 일치하는 회원이 있는지 확인 */
     @PostMapping("/find-pw")
     public MemberDto findPw(@RequestBody MemberDto mDto) {
         MemberDto memberDto = memberService.findPw(mDto);
@@ -104,15 +98,13 @@ public class MemberController {
         return memberDto;
     }
 
-    // api/member-api/pw-reset
-    // 비밀번호 재설정
+    /** 비밀번호 재설정 */
     @PostMapping("/pw-reset")
     public void pwReset(@RequestBody MemberDto memberDto) {
         memberService.resetPw(memberDto);
     }
 
-    // api/member-api/is-login
-    // 로그인 여부
+    /** 로그인 여부 */
     @GetMapping("is-login")
     public MemberDto isLogin(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
@@ -123,15 +115,13 @@ public class MemberController {
         return memberDto;
     }
 
-    // api/member-api/logout
-    // 로그아웃
+    /** 로그아웃 */
     @GetMapping("logout")
     public void logout(HttpSession session) {
         session.removeAttribute("loginId");
     }
 
-    // api/member-api/sms-send
-    // 인증번호 발송
+    /** 인증번호 발송 */
     @PostMapping("sms-send")
     public boolean smsSend(@RequestBody MemberDto mDto, HttpSession session) {
         // 인증번호 생성
@@ -259,8 +249,7 @@ public class MemberController {
         }
     }
 
-    // api/member-api/certify
-    // 인증하기
+    /** 인증하기 */
     @PostMapping("certify")
     public boolean certify(@RequestParam String phoneNumber, @RequestParam String certifyNum, HttpSession session) {
         if(phoneNumber.equals((String)session.getAttribute("phoneNumber"))
@@ -272,8 +261,7 @@ public class MemberController {
         }
     }
 
-    // api/member-api/oauth2/code/
-    // sns 로그인
+    /** sns 로그인 */
     @GetMapping("oauth2/code/{registrationId}")
     public Object snsLogin(@RequestParam String code, @PathVariable String registrationId, HttpSession session) {
         String accessToken = snsLoginService.getAccessToken(code, registrationId);
