@@ -16,4 +16,7 @@ public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Intege
     /** 메인페이지 오늘의 일정, 스케줄러 오늘의 일정, 스케줄러 타임 테이블, 스케줄러 다가오는 일정 */
     @Query(value = "select s from ScheduleEntity s order by s.scheduleStartDate")
     List<Object[]> findScheduleList(@Param("loginId")String loginId, @Param("date")Date date);
+
+    @Query(value = "select * from schedule where date_sub(schedule_startdate, interval schedule_reminder minute)=:now", nativeQuery = true)
+    List<ScheduleEntity> findScheduleToReminder(@Param("now")String now);
 }

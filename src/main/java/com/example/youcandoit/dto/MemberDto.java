@@ -17,6 +17,7 @@ public class MemberDto {
     private String profilePicture;
     private Date joinDate;
     private String memClass;
+    private String mobileToken;
 
     public MemberEntity toEntity() {
         return MemberEntity.builder()
@@ -27,6 +28,7 @@ public class MemberDto {
                 .profilePicture(profilePicture)
                 .joinDate(joinDate)
                 .memClass(memClass)
+                .mobileToken(mobileToken)
                 .build();
     }
 }
