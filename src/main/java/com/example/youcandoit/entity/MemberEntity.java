@@ -32,6 +32,8 @@ public class MemberEntity {
     private Date joinDate;
     @Column(name = "mem_class")
     private String memClass;
+    @Column(name = "mobile_token")
+    private String mobileToken;
 
     public MemberDto toDto() {
         return MemberDto.builder()
@@ -42,6 +44,7 @@ public class MemberEntity {
                 .profilePicture(profilePicture)
                 .joinDate(joinDate)
                 .memClass(memClass)
+                .mobileToken(mobileToken)
                 .build();
     }
 }

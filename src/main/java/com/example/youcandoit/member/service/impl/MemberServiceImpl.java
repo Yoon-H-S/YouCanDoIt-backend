@@ -1,8 +1,10 @@
 package com.example.youcandoit.member.service.impl;
 
 import com.example.youcandoit.dto.MemberDto;
+import com.example.youcandoit.entity.GodlifeGoalEntity;
 import com.example.youcandoit.entity.MemberEntity;
 import com.example.youcandoit.member.service.MemberService;
+import com.example.youcandoit.repository.GodlifeGoalRepository;
 import com.example.youcandoit.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,10 +14,12 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
 
     MemberRepository memberRepository;
+    GodlifeGoalRepository godlifeGoalRepository;
 
     @Autowired // 자동 연결
-    public MemberServiceImpl(MemberRepository memberRepository) {
+    public MemberServiceImpl(MemberRepository memberRepository, GodlifeGoalRepository godlifeGoalRepository) {
         this.memberRepository = memberRepository;
+        this.godlifeGoalRepository = godlifeGoalRepository;
     }
 
     /** 로그인 */
@@ -50,6 +54,8 @@ public class MemberServiceImpl implements MemberService {
         MemberEntity memberEntity = memberDto.toEntity();
         // db에 insert
         memberRepository.save(memberEntity);
+
+        godlifeGoalRepository.save(GodlifeGoalEntity.builder().memId(memberEntity.getMemId()).goalPedometer(10000).build());
     }
 
     /** 프로필사진경로 저장 */

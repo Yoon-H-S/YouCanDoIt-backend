@@ -1,10 +1,7 @@
 package com.example.youcandoit.entity;
 
 import com.example.youcandoit.dto.ReminderDto;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +19,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 public class ReminderEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reminder_number")
     private Integer reminderNumber;
     @Column(name = "mem_id")

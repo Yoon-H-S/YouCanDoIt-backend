@@ -4,6 +4,7 @@ import com.example.youcandoit.dto.*;
 import com.example.youcandoit.entity.*;
 import com.example.youcandoit.entity.Id.DiyCertifyId;
 import com.example.youcandoit.entity.Id.OppositeId;
+import com.example.youcandoit.firebase.FirebaseComponent;
 import com.example.youcandoit.repository.*;
 import com.example.youcandoit.challenge.service.ChallengeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,11 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -27,6 +31,8 @@ public class ChallengeServiceImpl implements ChallengeService {
     DiyAccumulateRepository diyAccumulateRepository;
     DiyCertifyRepository diyCertifyRepository;
     OppositeRepository oppositeRepository;
+    MemberRepository memberRepository;
+    ReminderRepository reminderRepository;
 
     @Autowired
     public ChallengeServiceImpl(
@@ -38,7 +44,9 @@ public class ChallengeServiceImpl implements ChallengeService {
             PedometerAccumulateRepository pedometerAccumulateRepository,
             DiyAccumulateRepository diyAccumulateRepository,
             DiyCertifyRepository diyCertifyRepository,
-            OppositeRepository oppositeRepository) {
+            OppositeRepository oppositeRepository,
+            MemberRepository memberRepository,
+            ReminderRepository reminderRepository) {
         this.groupPersonRepository = groupPersonRepository;
         this.godLifeChallengeRepository = godLifeChallengeRepository;
         this.groupRepository = groupRepository;
@@ -48,6 +56,8 @@ public class ChallengeServiceImpl implements ChallengeService {
         this.diyAccumulateRepository = diyAccumulateRepository;
         this.diyCertifyRepository = diyCertifyRepository;
         this.oppositeRepository = oppositeRepository;
+        this.memberRepository = memberRepository;
+        this.reminderRepository = reminderRepository;
     }
 
 
@@ -199,21 +209,62 @@ public class ChallengeServiceImpl implements ChallengeService {
     public int diyOpposite(OppositeDto oppositeDto) {
         Date today = Date.valueOf(LocalDate.now());
         Date certifyDay = oppositeDto.getCertifyDate();
-        int diffDate = (int)(today.getTime() - certifyDay.getTime()) / (1000*60*60*24);
+        int diffDate = (int)((today.getTime() - certifyDay.getTime()) / (1000*60*60*24))+1;
+        // 반대 기간이 지난경우
         if(diffDate > 7) {
             return diffDate;
         }
 
         OppositeEntity oppositeEntity = oppositeDto.toEntity();
         try {
+            // 인증 반대
             oppositeRepository.save(oppositeEntity);
             diyCertifyRepository.updateOppositeCount(oppositeEntity.getCertifyDate(), oppositeEntity.getGroupNumber(), oppositeEntity.getMemId());
+
+            // 인증에 대한 반대가 처음이라면
+            DiyCertifyId diyCertifyId = new DiyCertifyId(oppositeEntity.getCertifyDate(), oppositeEntity.getGroupNumber(), oppositeEntity.getMemId());
+            int count = diyCertifyRepository.findById(diyCertifyId).get().getOppositeCount();
+            if(count == 1) {
+                // 알림 관련
+                String now = LocalDate.now() + " " + LocalTime.now().toString().substring(0, 6) + "00";
+                String subject = groupRepository.findById(oppositeEntity.getGroupNumber()).get().getGroupSubject();
+                String nickname = memberRepository.findById(oppositeEntity.getMemId()).get().getNickname();
+
+                // 요일 구하기
+                LocalDate date = LocalDate.now();
+                String week = date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);
+
+                String content = String.format("%d/%d (%s) %s 챌린지 %s의 인증이 반대되었습니다. 반대 기간이 %d일 남았습니다. 투표에 참여해주세요",
+                        Integer.parseInt(date.toString().substring(5, 7)),
+                        Integer.parseInt(date.toString().substring(8, 10)),
+                        week, subject, nickname, 7-diffDate);
+
+                List<MemberEntity> getRow = groupPersonRepository.findGroupMemberInfo(oppositeEntity.getGroupNumber(), oppositeEntity.getOppositeId());
+
+                List<String> tokenList = new ArrayList<>();
+                for(MemberEntity entity : getRow) {
+                    String token = memberRepository.findById(entity.getMemId()).get().getMobileToken();
+                    if(token != null)
+                        tokenList.add(token); // 멤버 토큰 획득
+
+                    // 알림 저장
+                    ReminderEntity reminder = ReminderEntity.builder()
+                            .reminderNumber(0)
+                            .memId(entity.getMemId())
+                            .reminderContents(content)
+                            .reminderDate(now)
+                            .build();
+                    reminderRepository.save(reminder);
+                }
+                // 알림 전송
+                if(!tokenList.isEmpty())
+                    new FirebaseComponent().reminderToGroup(tokenList, "반대 투표", content);
+            }
             return diffDate;
         } catch (Exception e) {
             System.out.println(e);
             return 0;
         }
-
     }
 
     /** 예약된 챌린지 */
@@ -277,11 +328,34 @@ public class ChallengeServiceImpl implements ChallengeService {
         GroupEntity groupEntity = groupDto.toEntity();
         int groupNumber = groupRepository.save(groupEntity).getGroupNumber(); // 그룹 insert
 
+        // 알림 관련
+        List<String> tokenList = new ArrayList<>();
+        String content = groupEntity.getGroupSubject() + " 그룹 초대가 왔습니다.";
+        String now = LocalDate.now() + " " + LocalTime.now().toString().substring(0, 6) + "00";
+
+        // 멤버 초대
         GroupPersonEntity groupPersonEntity = GroupPersonEntity.builder().groupNumber(groupNumber).build();
         for(String member : members) {
             groupPersonEntity.setMemId(member);
             groupPersonRepository.save(groupPersonEntity); // 그룹멤버 insert
+
+            String token = memberRepository.findById(member).get().getMobileToken();
+            if(token != null)
+                tokenList.add(token); // 멤버 토큰 획득
+
+            // 알림 저장
+            ReminderEntity reminder = ReminderEntity.builder()
+                    .reminderNumber(0)
+                    .memId(member)
+                    .reminderContents(content)
+                    .reminderDate(now)
+                    .build();
+            reminderRepository.save(reminder);
         }
+
+        // 알림 전송
+        if(!tokenList.isEmpty())
+            new FirebaseComponent().reminderToGroup(tokenList, "그룹 초대", content);
 
         groupPersonEntity.setMemId(loginId);
         groupPersonEntity.setPersonStatus("1");
@@ -432,6 +506,8 @@ public class ChallengeServiceImpl implements ChallengeService {
             previousGroupNum = row.getGroupNumber();
             previousPedoRes = row.getCertifyCount();
         }
+
+
 
         // 기간이 지난 그룹 종료하기
         System.out.println("기간 지난 그룹 종료하기");

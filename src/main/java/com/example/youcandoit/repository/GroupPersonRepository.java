@@ -34,6 +34,16 @@ public interface GroupPersonRepository extends JpaRepository<GroupPersonEntity, 
     List<Object[]> findInviteMember(@Param("groupNumber")int groupNumber);
 
     /*
+    =========================================챌린지페이지=========================================================
+     */
+
+    /** 그룹멤버들 정보 */
+    @Query(value = "select m from MemberEntity m " +
+            "join GroupPersonEntity p on p.memId = m.memId " +
+            "where p.groupNumber=:groupNumber and m.memId<>:loginId")
+    List<MemberEntity> findGroupMemberInfo(@Param("groupNumber")int groupNumber, @Param("loginId")String loginId);
+
+    /*
     =========================================자정에 동작하는 데이터베이스 업데이트=========================================================
      */
 

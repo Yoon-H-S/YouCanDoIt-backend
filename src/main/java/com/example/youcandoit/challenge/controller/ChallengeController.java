@@ -2,6 +2,7 @@ package com.example.youcandoit.challenge.controller;
 
 import com.example.youcandoit.challenge.service.ChallengeService;
 import com.example.youcandoit.dto.*;
+import com.example.youcandoit.firebase.FirebaseAdmin;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -99,9 +100,11 @@ public class ChallengeController {
         String extension = fileName.substring(fileName.length()-4); // 확장자 추출
         String dbName = "/groupImage/"+ "Image" + groupNumber  + extension; //  db에 저장될 경로, 저장명 지정
         String saveName = "/home/yun/ycdi/build/groupImage/" + "Image" + groupNumber + extension; // 실제 저장경로, 저장명 지정
+        String backupName = "/home/yun/ycdi/backup/groupImage/" + "Image" + groupNumber + extension; // 백업본
 
         try {
             file.transferTo(new File(saveName)); // 파일 저장
+            file.transferTo(new File(backupName)); // 백업본 저장
         } catch (IOException e) {
             e.printStackTrace();
         }

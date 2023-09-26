@@ -65,9 +65,11 @@ public class MemberController {
         String extension = fileName.substring(fileName.length()-4); // 확장자 추출
         String dbName = "/profilePicture/" + memId + "Profile" + extension; //  db에 저장될 경로, 저장명 지정
         String saveName = "/home/yun/ycdi/build/profilePicture/" + memId + "Profile" + extension; // 실제 저장경로, 저장명 지정
+        String backupName = "/home/yun/ycdi/backup/profilePicture/" + memId + "Profile" + extension; // 백업본
 
         try {
             file.transferTo(new File(saveName)); // 파일 저장
+            file.transferTo(new File(backupName)); // 백업본
         } catch (IOException e) {
             e.printStackTrace();
         }
