@@ -15,15 +15,13 @@ import java.sql.Date;
 public class StickerDto {
     private Date stickerDate;
     private String memId;
-    private Integer totalCount;
-    private Integer successCount;
+    private String stickerColor;
 
     public StickerEntity toEntity() {
         return StickerEntity.builder()
                 .stickerDate(stickerDate)
                 .memId(memId)
-                .totalCount(totalCount)
-                .successCount(successCount)
+                .stickerColor(stickerColor)
                 .build();
     }
 }

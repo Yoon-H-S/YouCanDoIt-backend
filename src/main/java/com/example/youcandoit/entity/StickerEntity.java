@@ -29,17 +29,14 @@ public class StickerEntity {
     @Id
     @Column(name = "mem_id")
     private String memId;
-    @Column(name = "total_count")
-    private Integer totalCount;
-    @Column(name = "success_count")
-    private Integer successCount;
+    @Column(name = "sticker_color")
+    private String stickerColor;
 
     public StickerDto toDto() {
         return StickerDto.builder()
                 .stickerDate(stickerDate)
                 .memId(memId)
-                .totalCount(totalCount)
-                .successCount(successCount)
+                .stickerColor(stickerColor)
                 .build();
     }
 }
