@@ -8,9 +8,7 @@ public interface ScheduleService {
 
     void addSchedule(ScheduleDto scheduleDto);
 
-    List<Object[]> mainDailySchedule(String loginId);
+    List<Object[]> timeTableDailySchedule(String loginId);
 
-    List<Object[]> scheduleTimetableDailySchedule(String loginId);
-
-    List<Object[]> onComingSchedule(String loginId);
+    List<Object[]> schedulerOnComingSchedule(String loginId);
 }
