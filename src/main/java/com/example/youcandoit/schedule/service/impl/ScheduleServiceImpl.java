@@ -34,54 +34,34 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleRepository.save(scheduleEntity);
     }
 
-    /** 메인페이지 오늘의 일정 */
+    /** 스케줄러 오늘의 일정 */
     @Override
-    public List<Object[]> mainDailySchedule(String loginId) {
+    public List<Object[]> timeTableDailySchedule(String loginId) {
         Date date = Date.valueOf(LocalDate.now());
-        List<Object[]> getRow = scheduleRepository.findScheduleList(loginId, date);
-        List<Object[]> mainDailyScheduleData = new ArrayList<Object[]>();
-        for(Object[] row : getRow) {
-            ScheduleDto scheduleDto = ((ScheduleEntity)row[0]).toDto();
-            String startDate = scheduleDto.getScheduleStartDate().substring(0,10);
-            int compare = startDate.compareTo(String.valueOf(date));
-            if(compare == 0) // 일정 시작날짜가 오늘와 같다면
-                // 일정 제목
-                mainDailyScheduleData.add(new Object[]{scheduleDto.getScheduleTitle()});
-        }
-        return mainDailyScheduleData;
-    }
+        List<ScheduleEntity> scheduleEntities = scheduleRepository.findSchedule(loginId, date);
 
-    /**  스케줄러 오늘의 일정 & 타임 테이블  */
-    @Override
-    public List<Object[]> scheduleTimetableDailySchedule(String loginId) {
-        Date date = Date.valueOf(LocalDate.now());
-        List<Object[]> getRow = scheduleRepository.findScheduleList(loginId, date);
-        List<Object[]> scheduleTimetableDailyScheduleData = new ArrayList<Object[]>();
-        for (Object[] row : getRow) {
-            ScheduleDto scheduleDto = ((ScheduleEntity) row[0]).toDto();
-            String startDate = scheduleDto.getScheduleStartDate().substring(0, 10);
-            int compare = startDate.compareTo(String.valueOf(date));
-            if (compare == 0) // 일정 시작날짜가 현재 날짜와 같다면
-                // 일정 제목
-                scheduleTimetableDailyScheduleData.add(new Object[]{scheduleDto.getScheduleTitle(), scheduleDto.getScheduleStartDate(), scheduleDto.getScheduleEndDate()});
+        List<Object[]> dailySchedule = new ArrayList<Object[]>();
+        for (ScheduleEntity scheduleEntity : scheduleEntities) {
+            dailySchedule.add(new Object[]{scheduleEntity.getScheduleStartDate().substring(11, 16), scheduleEntity.getScheduleEndDate().substring(11, 16), scheduleEntity.getScheduleTitle()});
         }
-        return scheduleTimetableDailyScheduleData;
+
+        return dailySchedule;
     }
 
     /** 스케줄러 다가오는 일정 */
     @Override
-    public List<Object[]> onComingSchedule(String loginId) {
-        Date date = Date.valueOf(LocalDate.now());
-        List<Object[]> getRow = scheduleRepository.findScheduleList(loginId, date);
-        List<Object[]> onComingScheduleData = new ArrayList<Object[]>();
-        for (Object[] row : getRow) {
-            ScheduleDto scheduleDto = ((ScheduleEntity) row[0]).toDto();
-            String startDate = scheduleDto.getScheduleStartDate().substring(0, 10);
-            int compare = startDate.compareTo(String.valueOf(date));
-            if (compare > 0) // 일정의 시작날짜가 현재 날짜보다 크다면
-                // 일정 제목
-                onComingScheduleData.add(new Object[]{scheduleDto.getScheduleTitle(), scheduleDto.getScheduleStartDate(), scheduleDto.getScheduleEndDate()});
+    public List<Object[]> schedulerOnComingSchedule(String loginId) {
+        Date tomorrow = Date.valueOf(LocalDate.now().plusDays(1));
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String str = format.format(tomorrow);
+
+        List<ScheduleEntity> scheduleEntities = scheduleRepository.findOnComingSchedule(loginId, str);
+
+        List<Object[]> onComingSchedule = new ArrayList<Object[]>();
+        for (ScheduleEntity scheduleEntity : scheduleEntities) {
+            onComingSchedule.add(new Object[]{scheduleEntity.getScheduleStartDate().substring(5, 16), scheduleEntity.getScheduleEndDate().substring(5, 16), scheduleEntity.getScheduleTitle()});
         }
-        return onComingScheduleData;
+
+        return onComingSchedule;
     }
 }

@@ -28,28 +28,20 @@ public class ScheduleController {
         scheduleService.addSchedule(scheduleDto);
     }
 
-    /** 메인페이지 오늘의 일정 */
-    @PostMapping("/main-daily-schedule")
-    public List<Object[]> mainDailySchedule(HttpSession session) {
+    /** 메인페이지 오늘의 일정 스케줄러 타임 테이블, 오늘의 일정 */
+    @PostMapping("/timeTable-daily-schedule")
+    public List<Object[]> timeTableDailySchedule(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
-        List<Object[]> dailySchedule = scheduleService.mainDailySchedule(loginId);
-        return dailySchedule;
+        List<Object[]> timeTableDailySchedule = scheduleService.timeTableDailySchedule(loginId);
+        return timeTableDailySchedule;
     }
 
-    /** 스케줄러 오늘의 일정 & 스케줄러 타임 테이블 */
-    @PostMapping("/schedule-timetable-dailySchedule")
-    public List<Object[]> scheduleTimetableDailySchedule(HttpSession session) {
+    /** 스케줄러 다가오는 일정 */
+    @PostMapping("/scheduler-onComing-schedule")
+    public List<Object[]> schedulerOnComingSchedule(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
-        List<Object[]> scheduleTimetableDailySchedule = scheduleService.scheduleTimetableDailySchedule(loginId);
-        return scheduleTimetableDailySchedule;
-    }
-
-    /** 다가오는 일정 */
-    @PostMapping("/onComing-schedule")
-    public List<Object[]> onComingSchedule(HttpSession session) {
-        String loginId = (String)session.getAttribute("loginId");
-        List<Object[]> onComingSchedule = scheduleService.onComingSchedule(loginId);
-        return onComingSchedule;
+        List<Object[]> schedulerOnComingSchedule = scheduleService.schedulerOnComingSchedule(loginId);
+        return schedulerOnComingSchedule;
     }
 }
 
