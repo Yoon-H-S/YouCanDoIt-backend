@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.YearMonth;
 import java.util.List;
 
 @RestController
@@ -42,6 +43,22 @@ public class ScheduleController {
         String loginId = (String)session.getAttribute("loginId");
         List<Object[]> schedulerOnComingSchedule = scheduleService.schedulerOnComingSchedule(loginId);
         return schedulerOnComingSchedule;
+    }
+
+    /** 캘린더 제목 */
+    @PostMapping("/main-scheduler-calender")
+    public List<String[]> mainSchedulerCalender(HttpSession session, @RequestParam("month") YearMonth month) {
+        String loginId = (String)session.getAttribute("loginId");
+        List<String[]> mainSchedulerCalender = scheduleService.mainSchedulerCalender(loginId, month);
+        return mainSchedulerCalender;
+    }
+
+    /** 캘린더 스티커 날짜, 색깔*/
+    @PostMapping("/sticker-date-color")
+    public List<Object[]> stickerDateColor(HttpSession session, @RequestParam("month") YearMonth month) {
+        String loginId = (String)session.getAttribute("loginId");
+        List<Object[]> stickerDateColor = scheduleService.stickerDateColor(loginId, month);
+        return stickerDateColor;
     }
 }
 
