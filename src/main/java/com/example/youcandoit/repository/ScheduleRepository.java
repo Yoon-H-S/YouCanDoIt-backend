@@ -22,9 +22,9 @@ public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Intege
 
     /** 다가오는 일정 */
     @Query(value = "select s from ScheduleEntity s " +
-            "where s.memId = :loginId and s.scheduleStartDate >:date " +
+            "where s.memId = :loginId and s.scheduleStartDate between :startDate and :endDate " +
             "order by s.scheduleStartDate")
-    List<ScheduleEntity> findOnComingSchedule(@Param("loginId")String loginId ,@Param("date")String date);
+    List<ScheduleEntity> findOnComingSchedule(@Param("loginId")String loginId, @Param("startDate")String startDate, @Param("endDate")String endDate);
 
     @Query(value = "select * from schedule where date_sub(schedule_startdate, interval schedule_reminder minute)=:now", nativeQuery = true)
     List<ScheduleEntity> findScheduleToReminder(@Param("now")String now);

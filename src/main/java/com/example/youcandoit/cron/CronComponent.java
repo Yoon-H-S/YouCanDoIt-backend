@@ -5,12 +5,16 @@ import com.example.youcandoit.entity.*;
 import com.example.youcandoit.entity.Id.DiyCertifyId;
 import com.example.youcandoit.firebase.FirebaseComponent;
 import com.example.youcandoit.repository.*;
+import com.example.youcandoit.schedule.service.ScheduleService;
+import com.example.youcandoit.schedule.service.impl.ScheduleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.util.*;
@@ -96,6 +100,29 @@ public class CronComponent {
                 // 알림 전송
                 if(token != null)
                     fc.reminderToOne(token, "일정", content);
+
+                // 반복 일정이라면 일정 다시 생성
+                if(!entity.getScheduleRepeat().equals("0")) {
+                    LocalDateTime startDate = null;
+                    LocalDateTime endDate = null;
+                    switch (entity.getScheduleRepeat()) {
+                        case "1":
+                            startDate = LocalDateTime.parse(entity.getScheduleStartDate()).plusWeeks(1);
+                            endDate = LocalDateTime.parse(entity.getScheduleStartDate()).plusWeeks(1);
+                            break;
+                        case "2":
+                            startDate = LocalDateTime.parse(entity.getScheduleStartDate()).plusMonths(1);
+                            endDate = LocalDateTime.parse(entity.getScheduleStartDate()).plusMonths(1);
+                            break;
+                        case "3":
+                            startDate = LocalDateTime.parse(entity.getScheduleStartDate()).plusYears(1);
+                            endDate = LocalDateTime.parse(entity.getScheduleStartDate()).plusYears(1);
+                    }
+                    entity.setScheduleStartDate(startDate.toString());
+                    entity.setScheduleEndDate(endDate.toString());
+                    scheduleRepository.save(entity);
+                }
+
             }
         }
     }

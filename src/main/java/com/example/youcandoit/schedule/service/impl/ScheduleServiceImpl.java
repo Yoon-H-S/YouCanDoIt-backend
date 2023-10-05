@@ -48,7 +48,11 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         List<Object[]> dailySchedule = new ArrayList<Object[]>();
         for (ScheduleEntity scheduleEntity : scheduleEntities) {
-            dailySchedule.add(new Object[]{scheduleEntity.getScheduleStartDate().substring(11, 16), scheduleEntity.getScheduleEndDate().substring(11, 16), scheduleEntity.getScheduleTitle()});
+            dailySchedule.add(
+                    new Object[]{scheduleEntity.getScheduleStartDate().substring(11, 16),
+                            scheduleEntity.getScheduleEndDate().substring(11, 16),
+                            scheduleEntity.getScheduleTitle(),
+                            scheduleEntity.getScheduleSuccess()});
         }
 
         return dailySchedule;
@@ -57,15 +61,23 @@ public class ScheduleServiceImpl implements ScheduleService {
     /** 스케줄러 다가오는 일정 */
     @Override
     public List<Object[]> schedulerOnComingSchedule(String loginId) {
-        Date tomorrow = Date.valueOf(LocalDate.now().plusDays(1));
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String str = format.format(tomorrow);
+        String startDate = LocalDate.now().plusDays(1) + " 00:00:00";
+        String endDate = LocalDate.now().plusDays(7) + " 23:59:59";
 
-        List<ScheduleEntity> scheduleEntities = scheduleRepository.findOnComingSchedule(loginId, str);
+        List<ScheduleEntity> scheduleEntities = scheduleRepository.findOnComingSchedule(loginId, startDate, endDate);
+
+        if(scheduleEntities.isEmpty()) {
+            System.out.println("일주일 내 스케줄이 없으므로 한달 내 스케줄 조회");
+            endDate = LocalDate.now().plusMonths(1) + " 23:59:59";
+            scheduleEntities = scheduleRepository.findOnComingSchedule(loginId, startDate, endDate);
+        }
 
         List<Object[]> onComingSchedule = new ArrayList<Object[]>();
         for (ScheduleEntity scheduleEntity : scheduleEntities) {
-            onComingSchedule.add(new Object[]{scheduleEntity.getScheduleStartDate().substring(5, 16), scheduleEntity.getScheduleEndDate().substring(5, 16), scheduleEntity.getScheduleTitle()});
+            onComingSchedule.add(
+                    new Object[]{scheduleEntity.getScheduleStartDate().substring(5, 16),
+                            scheduleEntity.getScheduleEndDate().substring(5, 16),
+                            scheduleEntity.getScheduleTitle()});
         }
 
         return onComingSchedule;
