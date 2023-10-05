@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.awt.*;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,5 +36,11 @@ public interface StickerRepository extends JpaRepository<StickerEntity, StickerI
     /** diy 챌린지 달성 현황 */
     @Query(value = "select count(c) from DiyCertifyEntity c where certifyDate=:date and memId=:memId")
     Optional<Integer> findDiySuccess(@Param("date")Date date, @Param("memId")String memId);
+
+    /** 캘린더 스티커 날짜, 컬러 */
+    @Query(value = "select s from StickerEntity s " +
+            "where s.memId=:loginId and s.stickerDate > :sDate and s.stickerDate <= :eDate " +
+            "order by s.stickerDate")
+    List<StickerEntity> findStickerDateColor(@Param("loginId")String loginId, @Param("sDate") LocalDate sDate, @Param("eDate")LocalDate eDate);
 
 }
