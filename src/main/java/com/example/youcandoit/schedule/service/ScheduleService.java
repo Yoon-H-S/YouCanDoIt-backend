@@ -1,6 +1,8 @@
 package com.example.youcandoit.schedule.service;
 
+import com.example.youcandoit.dto.CalendarContentDto;
 import com.example.youcandoit.dto.ScheduleDto;
+import com.example.youcandoit.dto.TodayScheduleDto;
 
 import java.time.YearMonth;
 import java.util.List;
@@ -9,11 +11,11 @@ public interface ScheduleService {
 
     void addSchedule(ScheduleDto scheduleDto);
 
-    List<Object[]> timeTableDailySchedule(String loginId);
+    List<TodayScheduleDto> dailySchedule(String loginId);
 
-    List<Object[]> schedulerOnComingSchedule(String loginId);
+    void scheduleSuccess(int number, String success);
 
-    List<String[]> mainSchedulerCalender(String loginId, YearMonth month);
+    List<Object[]> onComingSchedule(String loginId);
 
-    List<Object[]> stickerDateColor(String loginId, YearMonth month);
+    CalendarContentDto schedulerCalendar(String loginId, YearMonth month);
 }

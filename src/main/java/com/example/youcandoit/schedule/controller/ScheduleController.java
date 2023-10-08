@@ -1,9 +1,6 @@
 package com.example.youcandoit.schedule.controller;
 
-import com.example.youcandoit.dto.FriendDto;
-import com.example.youcandoit.dto.GroupDto;
-import com.example.youcandoit.dto.MemberDto;
-import com.example.youcandoit.dto.ScheduleDto;
+import com.example.youcandoit.dto.*;
 import com.example.youcandoit.schedule.service.ScheduleService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,35 +27,31 @@ public class ScheduleController {
     }
 
     /** 메인페이지 오늘의 일정 스케줄러 타임 테이블, 오늘의 일정 */
-    @PostMapping("/timeTable-daily-schedule")
-    public List<Object[]> timeTableDailySchedule(HttpSession session) {
+    @PostMapping("/daily-schedule")
+    public List<TodayScheduleDto> dailySchedule(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
-        List<Object[]> timeTableDailySchedule = scheduleService.timeTableDailySchedule(loginId);
-        return timeTableDailySchedule;
+        return scheduleService.dailySchedule(loginId);
+    }
+
+    /** 일정 체크 */
+    @GetMapping("/schedule-success")
+    public void scheduleSuccess(@RequestParam int number, @RequestParam String success) {
+        scheduleService.scheduleSuccess(number, success);
     }
 
     /** 스케줄러 다가오는 일정 */
-    @PostMapping("/scheduler-onComing-schedule")
-    public List<Object[]> schedulerOnComingSchedule(HttpSession session) {
+    @PostMapping("/onComing-schedule")
+    public List<Object[]> onComingSchedule(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
-        List<Object[]> schedulerOnComingSchedule = scheduleService.schedulerOnComingSchedule(loginId);
-        return schedulerOnComingSchedule;
+        return scheduleService.onComingSchedule(loginId);
     }
 
-    /** 캘린더 제목 */
-    @PostMapping("/main-scheduler-calender")
-    public List<String[]> mainSchedulerCalender(HttpSession session, @RequestParam("month") YearMonth month) {
+    /** 캘린더 일정, 스티커 */
+    @PostMapping("/calender-scheduler")
+    public CalendarContentDto schedulerCalender(HttpSession session, @RequestParam("month") YearMonth month) {
         String loginId = (String)session.getAttribute("loginId");
-        List<String[]> mainSchedulerCalender = scheduleService.mainSchedulerCalender(loginId, month);
-        return mainSchedulerCalender;
-    }
-
-    /** 캘린더 스티커 날짜, 색깔*/
-    @PostMapping("/sticker-date-color")
-    public List<Object[]> stickerDateColor(HttpSession session, @RequestParam("month") YearMonth month) {
-        String loginId = (String)session.getAttribute("loginId");
-        List<Object[]> stickerDateColor = scheduleService.stickerDateColor(loginId, month);
-        return stickerDateColor;
+        CalendarContentDto calendarContent = scheduleService.schedulerCalendar(loginId, month);
+        return calendarContent;
     }
 }
 

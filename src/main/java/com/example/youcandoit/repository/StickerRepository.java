@@ -39,8 +39,8 @@ public interface StickerRepository extends JpaRepository<StickerEntity, StickerI
 
     /** 캘린더 스티커 날짜, 컬러 */
     @Query(value = "select s from StickerEntity s " +
-            "where s.memId=:loginId and s.stickerDate > :sDate and s.stickerDate <= :eDate " +
+            "where s.memId=:loginId and s.stickerDate between :sDate and :eDate " +
             "order by s.stickerDate")
-    List<StickerEntity> findStickerDateColor(@Param("loginId")String loginId, @Param("sDate") LocalDate sDate, @Param("eDate")LocalDate eDate);
+    List<StickerEntity> findStickerDateColor(@Param("loginId")String loginId, @Param("sDate")LocalDate sDate, @Param("eDate")LocalDate eDate);
 
 }
