@@ -1,8 +1,7 @@
 package com.example.youcandoit.repository;
 
-import com.example.youcandoit.entity.DiyCertifyEntity;
-import com.example.youcandoit.entity.GroupEntity;
-import com.example.youcandoit.entity.MemberEntity;
+import com.example.youcandoit.dto.OnComingScheduleDto;
+import com.example.youcandoit.dto.TodayScheduleDto;
 import com.example.youcandoit.entity.ScheduleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,28 +9,36 @@ import org.springframework.data.repository.query.Param;
 
 import java.sql.Date;
 import java.util.List;
-import java.util.Optional;
 
 public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Integer> {
 
     /** 메인페이지 오늘의 일정, 스케줄러 타임테이블, 스케줄러 오늘의 일정*/
-    @Query(value = "select s from ScheduleEntity s " +
+    @Query(value = "select s.scheduleNumber as number, " +
+            "s.scheduleTitle as title, " +
+            "date_format(s.scheduleStartDate, '%H:%i') as startTime, " +
+            "date_format(s.scheduleEndDate, '%H:%i') as endTime, " +
+            "s.scheduleSuccess as success " +
+            "from ScheduleEntity s " +
             "where s.memId = :loginId and s.scheduleStartDate like :date% " +
             "order by s.scheduleStartDate")
-    List<ScheduleEntity> findSchedule(@Param("loginId")String loginId, @Param("date") Date date);
+    List<TodayScheduleDto> findSchedule(@Param("loginId")String loginId, @Param("date") Date date);
 
     /** 다가오는 일정 */
-    @Query(value = "select s from ScheduleEntity s " +
+    @Query(value = "select s.scheduleTitle as title, " +
+            "date_format(s.scheduleStartDate, '%m/%d') as startDate, " +
+            "date_format(s.scheduleStartDate, '%H:%i') as startTime, " +
+            "date_format(s.scheduleEndDate, '%H:%i') as endTime " +
+            "from ScheduleEntity s " +
             "where s.memId = :loginId and s.scheduleStartDate between :startDate and :endDate " +
             "order by s.scheduleStartDate")
-    List<ScheduleEntity> findOnComingSchedule(@Param("loginId")String loginId, @Param("startDate")String startDate, @Param("endDate")String endDate);
+    List<OnComingScheduleDto> findOnComingSchedule(@Param("loginId")String loginId, @Param("startDate")String startDate, @Param("endDate")String endDate);
 
     @Query(value = "select * from schedule where date_sub(schedule_startdate, interval schedule_reminder minute)=:now", nativeQuery = true)
     List<ScheduleEntity> findScheduleToReminder(@Param("now")String now);
 
-    /** 메인 캘린더, 스케줄러 캘린더 제목 */
-    @Query(value = "select s from ScheduleEntity s " +
-            "where s.memId=:loginId and s.scheduleStartDate>=:sDate and s.scheduleStartDate<=:eDate " +
+    /** 메인 캘린더, 스케줄러 캘린더 일정 */
+    @Query(value = "select date_format(s.scheduleStartDate, '%Y-%m-%d') from ScheduleEntity s " +
+            "where s.memId=:loginId and s.scheduleStartDate between :sDate and :eDate " +
             "order by s.scheduleStartDate")
-    List<ScheduleEntity> findCalender(@Param("loginId")String loginId, @Param("sDate")String sDate, @Param("eDate")String eDate);
+    List<String> findCalendar(@Param("loginId")String loginId, @Param("sDate")String sDate, @Param("eDate")String eDate);
 }
