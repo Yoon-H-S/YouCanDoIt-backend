@@ -26,8 +26,15 @@ public class ScheduleController {
         scheduleService.addSchedule(scheduleDto);
     }
 
-    /** 메인페이지 오늘의 일정 스케줄러 타임 테이블, 오늘의 일정 */
-    @PostMapping("/daily-schedule")
+    /** 타임테이블 */
+    @GetMapping("/time-table")
+    public List<TimeTableDto> timeTable(HttpSession session) {
+        String loginId = (String)session.getAttribute("loginId");
+        return scheduleService.getTimeTable(loginId);
+    }
+
+    /** 메인페이지 오늘의 일정 스케줄러, 오늘의 일정 */
+    @GetMapping("/daily-schedule")
     public List<TodayScheduleDto> dailySchedule(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
         return scheduleService.dailySchedule(loginId);
@@ -40,14 +47,14 @@ public class ScheduleController {
     }
 
     /** 스케줄러 다가오는 일정 */
-    @PostMapping("/onComing-schedule")
+    @GetMapping("/onComing-schedule")
     public List<Object[]> onComingSchedule(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
         return scheduleService.onComingSchedule(loginId);
     }
 
     /** 캘린더 일정, 스티커 */
-    @PostMapping("/calender-scheduler")
+    @GetMapping("/calender-scheduler")
     public CalendarContentDto schedulerCalender(HttpSession session, @RequestParam("month") YearMonth month) {
         String loginId = (String)session.getAttribute("loginId");
         CalendarContentDto calendarContent = scheduleService.schedulerCalendar(loginId, month);

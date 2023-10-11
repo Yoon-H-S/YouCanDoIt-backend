@@ -43,6 +43,49 @@ public class ScheduleServiceImpl implements ScheduleService {
         return dailyScheduleList;
     }
 
+    /** 타임테이블 */
+    @Override
+    public List<TimeTableDto> getTimeTable(String loginId) {
+        Date date = Date.valueOf(LocalDate.now());
+        List<ScheduleTimeDto> timeList = scheduleRepository.findTime(loginId, date);
+
+        List<TimeTableDto> timeTableList = new ArrayList<>();
+        for(ScheduleTimeDto dto : timeList) {
+            // 하루종일인 일정은 타임테이블 표시x
+            if(dto.getStartHour() == 00 && dto.getStartMinute() == 00
+                    && dto.getEndHour() == 23 && dto.getEndMinute() == 59) {
+                continue;
+            }
+
+            for(int i = dto.getStartHour(); i <= dto.getEndHour(); i++) {
+                TimeTableDto timeTable = new TimeTableDto();
+                // 시간지정
+                timeTable.setHour(i);
+
+                // startTime 구하기
+                if(i == dto.getStartHour()) { // i가 시작시간이면(반복문의 첫번째면) 시작분으로 지정
+                    timeTable.setStartTime(dto.getStartMinute());
+                } else { // 시작시간이 아니라면 0으로 지정
+                    timeTable.setStartTime(0);
+                }
+
+                // minute 구하기
+                if(dto.getStartHour() == dto.getEndHour()) { // 시작시간과 종료시간이 같다면 종료분에서 시작분 빼기
+                    timeTable.setMinute(dto.getEndMinute() - dto.getStartMinute());
+                } else if(i == dto.getEndHour()) { // i가 종료시간이면(반복문의 마지막이면) 종료분으로 지정
+                    timeTable.setMinute(dto.getEndMinute());
+                } else { // 종료시간이 아니라면 60 지정
+                    timeTable.setMinute(60);
+                }
+
+                timeTableList.add(timeTable);
+            }
+        }
+
+        return timeTableList;
+    }
+
+    /** 일정 체크 */
     @Override
     public void scheduleSuccess(int number, String success) {
         ScheduleEntity entity = scheduleRepository.findById(number).get();
