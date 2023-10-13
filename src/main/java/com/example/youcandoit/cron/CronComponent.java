@@ -9,6 +9,7 @@ import com.example.youcandoit.schedule.service.ScheduleService;
 import com.example.youcandoit.schedule.service.impl.ScheduleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -57,11 +58,13 @@ public class CronComponent {
     }
 
     /** 일정알림 만들기 */
+    @Async
     @Scheduled(cron = "0 0/1 * * * *")
     public void ScheduleReminder() {
         // 현재 시간을 구함
         String now = LocalDate.now() + " " + LocalTime.now().toString().substring(0, 6) + "00";
         System.out.println("스케줄 리마인더 : " + now);
+        System.out.println("실제 시간 : " + LocalTime.now());
         // 알림을 전송해야할 일정이 있는지 확인
         List<ScheduleEntity> scheduleEntityList = scheduleRepository.findScheduleToReminder(now);
         // 있다면
@@ -74,16 +77,27 @@ public class CronComponent {
                 LocalDate date = LocalDate.parse(entity.getScheduleStartDate().substring(0, 10));
                 String week = date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);
 
-                String time = entity.getScheduleStartDate().substring(11, 13) + "시";
-                if(!entity.getScheduleStartDate().substring(14, 16).equals("00")) {
-                    time += " " + entity.getScheduleStartDate().substring(14, 16) + "분";
-                }
+                String content = "";
 
-                // 알림 내용 생성
-                String content = String.format("%d/%d (%s) [%s] %s 일정이 있습니다.",
-                        Integer.parseInt(entity.getScheduleStartDate().substring(5, 7)),
-                        Integer.parseInt(entity.getScheduleStartDate().substring(8, 10)),
-                        week, time, entity.getScheduleTitle());
+                if(entity.getScheduleStartDate().substring(11, 16).equals("00:00") &&
+                    entity.getScheduleEndDate().substring(11, 16).equals("23:59")) {
+                    // 알림 내용 생성
+                    content = String.format("%d/%d (%s) %s 일정이 있습니다.",
+                            Integer.parseInt(entity.getScheduleStartDate().substring(5, 7)),
+                            Integer.parseInt(entity.getScheduleStartDate().substring(8, 10)),
+                            week, entity.getScheduleTitle());
+                } else {
+                    String time = entity.getScheduleStartDate().substring(11, 13) + "시";
+                    if(!entity.getScheduleStartDate().substring(14, 16).equals("00")) {
+                        time += " " + entity.getScheduleStartDate().substring(14, 16) + "분";
+                    }
+
+                    // 알림 내용 생성
+                    content = String.format("%d/%d (%s) [%s] %s 일정이 있습니다.",
+                            Integer.parseInt(entity.getScheduleStartDate().substring(5, 7)),
+                            Integer.parseInt(entity.getScheduleStartDate().substring(8, 10)),
+                            week, time, entity.getScheduleTitle());
+                }
 
                 // 알림 저장
                 ReminderEntity reminder = ReminderEntity.builder()
@@ -128,6 +142,7 @@ public class CronComponent {
     }
 
     /** 1시간마다 랭킹 업데이트 */
+    @Async
     @Scheduled(cron = "0 1 1-23/1 * * *")
 //    @Scheduled(cron = "0/10 * * * * *")
     public void rankingUpdate() {
@@ -159,6 +174,7 @@ public class CronComponent {
     }
 
     /** 자정마다 데이터베이스 업데이트 */
+    @Async
     @Scheduled(cron = "0 1 0 * * *")
 //    @Scheduled(cron = "0/10 * * * * *")
     public void databaseUpdate() {

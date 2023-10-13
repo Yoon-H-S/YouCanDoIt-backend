@@ -1,5 +1,6 @@
 package com.example.youcandoit.firebase;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -22,12 +23,14 @@ public class FirebaseComponent {
         admin.sendGroupMessage(tokenList, title, content);
     }
 
+    @Async
     @Scheduled(cron = "0 0 1-23/1 * * *")
     public void pedometerUpdate() {
         System.out.println("만보기값 업데이트");
         admin.sendPedometerUpdate("0");
     }
 
+    @Async
     @Scheduled(cron = "0 0 0 * * *")
     public void pedometerUpdateAtMidnight() {
         System.out.println("만보기값 업데이트(자정)");
