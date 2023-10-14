@@ -36,7 +36,6 @@ public class FirebaseAdmin {
                     .putData("content", content)
                     .setToken(token)
                     .setAndroidConfig(AndroidConfig.builder().setPriority(HIGH).build())
-                    .setApnsConfig(ApnsConfig.builder().putHeader("apns-priority", "10").build())
                     .setWebpushConfig(WebpushConfig.builder().putHeader("Urgency", "high").build())
                     .build();
 
@@ -54,7 +53,6 @@ public class FirebaseAdmin {
                     .putData("content", content)
                     .addAllTokens(tokenList)
                     .setAndroidConfig(AndroidConfig.builder().setPriority(HIGH).build())
-                    .setApnsConfig(ApnsConfig.builder().putHeader("apns-priority", "10").build())
                     .setWebpushConfig(WebpushConfig.builder().putHeader("Urgency", "high").build())
                     .build();
 
@@ -75,7 +73,6 @@ public class FirebaseAdmin {
                     .putData("isLast", isLast)
                     .setTopic("pedometerUpdate")
                     .setAndroidConfig(AndroidConfig.builder().setPriority(HIGH).build())
-                    .setApnsConfig(ApnsConfig.builder().putHeader("apns-priority", "10").build())
                     .setWebpushConfig(WebpushConfig.builder().putHeader("Urgency", "high").build())
                     .build();
 
