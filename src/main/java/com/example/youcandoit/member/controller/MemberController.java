@@ -68,8 +68,9 @@ public class MemberController {
         String backupName = "/home/yun/ycdi/backup/profilePicture/" + memId + "Profile" + extension; // 백업본
 
         try {
+            MultipartFile backupFile = file;
+            backupFile.transferTo(new File(backupName)); // 백업본 저장
             file.transferTo(new File(saveName)); // 파일 저장
-            file.transferTo(new File(backupName)); // 백업본
         } catch (IOException e) {
             e.printStackTrace();
         }

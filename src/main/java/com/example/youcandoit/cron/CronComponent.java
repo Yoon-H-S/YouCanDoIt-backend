@@ -59,7 +59,7 @@ public class CronComponent {
 
     /** 일정알림 만들기 */
     @Async
-    @Scheduled(cron = "0 0/1 * * * *")
+    @Scheduled(cron = "1 0/1 * * * *")
     public void ScheduleReminder() {
         // 현재 시간을 구함
         String now = LocalDate.now() + " " + LocalTime.now().toString().substring(0, 6) + "00";

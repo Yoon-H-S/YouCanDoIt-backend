@@ -3,15 +3,14 @@ package com.example.youcandoit.firebase;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.MulticastMessage;
+import com.google.firebase.messaging.*;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
+
+import static com.google.firebase.messaging.AndroidConfig.Priority.HIGH;
 
 public class FirebaseAdmin {
 
@@ -36,6 +35,9 @@ public class FirebaseAdmin {
                     .putData("title", title)
                     .putData("content", content)
                     .setToken(token)
+                    .setAndroidConfig(AndroidConfig.builder().setPriority(HIGH).build())
+                    .setApnsConfig(ApnsConfig.builder().putHeader("apns-priority", "10").build())
+                    .setWebpushConfig(WebpushConfig.builder().putHeader("Urgency", "high").build())
                     .build();
 
             FirebaseMessaging.getInstance().send(message);
@@ -51,6 +53,9 @@ public class FirebaseAdmin {
                     .putData("title", title)
                     .putData("content", content)
                     .addAllTokens(tokenList)
+                    .setAndroidConfig(AndroidConfig.builder().setPriority(HIGH).build())
+                    .setApnsConfig(ApnsConfig.builder().putHeader("apns-priority", "10").build())
+                    .setWebpushConfig(WebpushConfig.builder().putHeader("Urgency", "high").build())
                     .build();
 
             FirebaseMessaging.getInstance().sendMulticast(message);
@@ -69,6 +74,9 @@ public class FirebaseAdmin {
                     .putData("date",date)
                     .putData("isLast", isLast)
                     .setTopic("pedometerUpdate")
+                    .setAndroidConfig(AndroidConfig.builder().setPriority(HIGH).build())
+                    .setApnsConfig(ApnsConfig.builder().putHeader("apns-priority", "10").build())
+                    .setWebpushConfig(WebpushConfig.builder().putHeader("Urgency", "high").build())
                     .build();
 
             FirebaseMessaging.getInstance().send(message);
