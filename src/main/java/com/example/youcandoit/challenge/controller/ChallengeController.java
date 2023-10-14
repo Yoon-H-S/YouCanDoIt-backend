@@ -102,8 +102,9 @@ public class ChallengeController {
         String backupName = "/home/yun/ycdi/backup/groupImage/" + "Image" + groupNumber + extension; // 백업본
 
         try {
+            MultipartFile backupFile = file;
+            backupFile.transferTo(new File(backupName)); // 백업본 저장
             file.transferTo(new File(saveName)); // 파일 저장
-            file.transferTo(new File(backupName)); // 백업본 저장
         } catch (IOException e) {
             e.printStackTrace();
         }
