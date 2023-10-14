@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.security.*;
 import java.sql.Date;
 import java.util.*;
@@ -68,9 +70,9 @@ public class MemberController {
         String backupName = "/home/yun/ycdi/backup/profilePicture/" + memId + "Profile" + extension; // 백업본
 
         try {
-            MultipartFile backupFile = file;
-            backupFile.transferTo(new File(backupName)); // 백업본 저장
-            file.transferTo(new File(saveName)); // 파일 저장
+            File saveFile = new File(saveName);
+            file.transferTo(saveFile); // 파일 저장
+            Files.copy(saveFile.toPath(), new File(backupName).toPath(), StandardCopyOption.REPLACE_EXISTING); // 백업본 저장
         } catch (IOException e) {
             e.printStackTrace();
         }
