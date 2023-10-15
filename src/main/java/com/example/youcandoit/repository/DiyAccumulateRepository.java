@@ -1,5 +1,6 @@
 package com.example.youcandoit.repository;
 
+import com.example.youcandoit.dto.MyRankDto;
 import com.example.youcandoit.entity.DiyAccumulateEntity;
 import com.example.youcandoit.entity.Id.DiyAccumulateId;
 import com.example.youcandoit.entity.PedometerAccumulateEntity;
@@ -13,6 +14,19 @@ import java.sql.Date;
 import java.util.List;
 
 public interface DiyAccumulateRepository extends JpaRepository<DiyAccumulateEntity, DiyAccumulateId> {
+
+    /** 나의랭킹 */
+    @Query(value = "select new com.example.youcandoit.dto.MyRankDto(g.groupName, " +
+            "g.groupSubject, " +
+            "g.groupImage, " +
+            "datediff(g.groupEnddate, :date), " +
+            "d.diyaccuRank) " +
+            "from DiyAccumulateEntity d " +
+            "join GroupPersonEntity p on d.groupNumber = p.groupNumber and d.memId = p.memId " +
+            "join GroupEntity g on p.groupNumber = g.groupNumber " +
+            "where d.memId=:loginId and g.groupState=2 " +
+            "order by groupEnddate")
+    List<MyRankDto> findMyRankingList(@Param("loginId")String loginId, @Param("date")String date);
 
     /** diy 챌린지 리스트의 순위 */
     @Query(value = "select m.profilePicture, a.certifyCount from GroupPersonEntity p " +

@@ -8,17 +8,13 @@ import com.example.youcandoit.firebase.FirebaseComponent;
 import com.example.youcandoit.repository.*;
 import com.example.youcandoit.challenge.service.ChallengeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ChallengeServiceImpl implements ChallengeService {
@@ -61,18 +57,20 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
 
-    /** 나의 랭킹 */
+    /**
+     * 나의 랭킹
+     */
     @Override
-    public List<Object[]> myRanking(String loginId) {
+    public List<MyRankDto> myRanking(String loginId) {
         Date date = Date.valueOf(LocalDate.now());
-        List<Object[]> getRow = pedometerRankingRepository.findMyRankingList(loginId, date);
-        List<Object[]> myRankData = new ArrayList<Object[]>();
-        for(Object[] row : getRow) {
-            GroupDto groupDto = ((GroupEntity)row[0]).toDto();
-            long dDay = (groupDto.getGroupEnddate().getTime() - date.getTime()) / (1000 * 60 * 60 * 24); // getTime()의 반환값이 밀리세컨드이기 때문에 계산을 해야 한다.
-            // 랭킹, 남은날짜, 그룹이미지, 그룹주제, 그룹이름
-            myRankData.add(new Object[]{groupDto.getGroupName(), groupDto.getGroupSubject(), groupDto.getGroupImage(), dDay, row[1]});
-        }
+        List<MyRankDto> getPedometerRow = pedometerRankingRepository.findMyRankingList(loginId, date.toString(),date);
+        List<MyRankDto> getDiyRow = diyAccumulateRepository.findMyRankingList(loginId, date.toString());
+        List<MyRankDto> myRankData = new ArrayList<>();
+        myRankData.addAll(getPedometerRow);
+        myRankData.addAll(getDiyRow);
+
+        Collections.sort(myRankData);
+
         return myRankData;
     }
 

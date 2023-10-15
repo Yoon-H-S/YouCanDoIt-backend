@@ -1,5 +1,6 @@
 package com.example.youcandoit.repository;
 
+import com.example.youcandoit.dto.MyRankDto;
 import com.example.youcandoit.entity.GroupPersonEntity;
 import com.example.youcandoit.entity.Id.PedometerRankingId;
 import com.example.youcandoit.entity.PedometerRankingEntity;
@@ -39,14 +40,19 @@ public interface PedometerRankingRepository extends JpaRepository<PedometerRanki
      */
 
     /** 나의랭킹 */
-    @Query(value = "select g, r.pedometerRank from PedometerRankingEntity r " +
+    @Query(value = "select new com.example.youcandoit.dto.MyRankDto(g.groupName, " +
+            "g.groupSubject, " +
+            "g.groupImage, " +
+            "datediff(g.groupEnddate, :strDate), " +
+            "r.pedometerRank) " +
+            "from PedometerRankingEntity r " +
             "join GroupPersonEntity p on r.groupNumber = p.groupNumber and r.memId = p.memId " +
             "join GroupEntity g on p.groupNumber = g.groupNumber " +
             "where r.pedometerDate=:date and r.memId=:loginId and g.groupState=2 " +
             "order by groupEnddate")
-    List<Object[]> findMyRankingList(@Param("loginId")String loginId, @Param("date")Date date);
+    List<MyRankDto> findMyRankingList(@Param("loginId")String loginId, @Param("strDate")String strDate, @Param("date")Date date);
 
-    /*
+    /**
     =========================================자정에 동작하는 데이터베이스 업데이트=========================================================
      */
 

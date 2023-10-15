@@ -27,9 +27,9 @@ public class ChallengeController {
 
     /** 메인페이지 나의랭킹 */
     @GetMapping("/my-ranking")
-    public List<Object[]> myRanking(HttpSession session) {
+    public List<MyRankDto> myRanking(HttpSession session) {
         String loginId = (String)session.getAttribute("loginId");
-        List<Object[]> myRank = challengeService.myRanking(loginId);
+        List<MyRankDto> myRank = challengeService.myRanking(loginId);
         return myRank;
     }
 

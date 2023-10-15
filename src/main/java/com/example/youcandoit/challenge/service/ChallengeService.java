@@ -7,8 +7,10 @@ import java.util.List;
 
 public interface ChallengeService {
 
-    /** 나의 랭킹 */
-    List<Object[]> myRanking(String loginId);
+    /**
+     * 나의 랭킹
+     */
+    List<MyRankDto> myRanking(String loginId);
 
     /** 예약된 챌린지 */
     List<GroupDto> challengeReservation(String loginId);
